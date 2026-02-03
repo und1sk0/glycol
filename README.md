@@ -4,7 +4,7 @@ Real-time airport flight monitor built on the [OpenSky Network](https://opensky-
 
 ## Features
 
-- Monitor aircraft state vectors within a 5 NM radius of 40+ pre-configured airports
+- Monitor aircraft state vectors within a 5 NM radius of 2000+ US airports
 - Automatic detection of takeoff and landing events
 - Three filtering modes:
   - **Mode A** - Filter by ICAO24 address or callsign
@@ -58,7 +58,7 @@ The status bar shows authentication state, API rate limit info, and event count.
 
 ## Supported Airports
 
-Includes 40+ airports: major US commercial (KSFO, KJFK, KLAX, KORD, KATL, KDEN, KDFW, KBOS, ...), US military (KADW, KFFO, KEDW, KNUQ, ...), and international (EGLL, LFPG, RJTT, WSSS, ...). See `glycol/airports.py` for the full list.
+Includes 2000+ US airports (commercial, military, GA, and heliports) sourced from the OurAirports dataset. Covers all ICAO-coded airports in the US and territories (GU, PR, VI, AS, MP). See `glycol/data/us_airports.json` for the full list.
 
 ## Project Structure
 
@@ -71,5 +71,6 @@ glycol/
   monitor.py    # Takeoff/landing event detection
   airports.py   # Airport database and bounding box math
   ui.py         # Tkinter GUI
-  data.py       # Event storage and CSV export
+  events.py     # Event storage and CSV export
+  data/         # Airport database (us_airports.json)
 ```

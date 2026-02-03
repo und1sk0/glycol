@@ -7,7 +7,7 @@ from glycol.auth import OpenSkyAuth
 from glycol.api import OpenSkyClient
 from glycol.airports import get_bounding_box, airport_name, AIRPORTS
 from glycol.monitor import AircraftMonitor
-from glycol.data import EventStore
+from glycol.events import EventStore
 
 
 class CredentialsDialog(simpledialog.Dialog):
