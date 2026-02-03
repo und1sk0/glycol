@@ -9,11 +9,21 @@ class AircraftMonitor:
     MODE_B = "B"  # Filter by aircraft category codes
     MODE_C = "C"  # All traffic
 
-    def __init__(self, mode: str = "C", filter_values: list[str] | None = None):
+    FEET_TO_METERS = 0.3048
+
+    def __init__(
+        self,
+        mode: str = "C",
+        filter_values: list[str] | None = None,
+        ceiling_ft: float | None = 1500,
+    ):
         self.mode = mode.upper()
         self.filter_values: list[str] = [
             v.strip().upper() for v in (filter_values or [])
         ]
+        self.ceiling_m: float | None = (
+            ceiling_ft * self.FEET_TO_METERS if ceiling_ft is not None else None
+        )
         # icao24 -> on_ground (bool)
         self._prev_states: dict[str, bool] = {}
 
@@ -48,6 +58,11 @@ class AircraftMonitor:
         for state in states:
             if not self._matches_filter(state):
                 continue
+
+            if self.ceiling_m is not None:
+                alt = state.get("baro_altitude")
+                if alt is not None and alt > self.ceiling_m:
+                    continue
 
             icao24 = state.get("icao24", "")
             on_ground = state.get("on_ground", False)
