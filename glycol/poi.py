@@ -58,13 +58,14 @@ class PlaneOfInterest:
 class POIDatabase:
     """Manages the planes of interest database."""
 
-    def __init__(self, db_path: Optional[Path] = None, data_dir: Optional[Path] = None):
+    def __init__(self, db_path: Optional[Path] = None, data_dir: Optional[Path] = None, category: str = "default"):
         """
         Initialize the POI database.
 
         Args:
             db_path: Path to the JSON database file. If None, uses default location.
             data_dir: Directory containing data files. If provided, db_path is relative to this.
+            category: Which category/dictionary to use (default: "default").
         """
         if db_path is None:
             if data_dir is None:
@@ -75,6 +76,7 @@ class POIDatabase:
             db_path = Path(db_path)
 
         self.db_path = db_path
+        self.category = category
         self.planes: List[PlaneOfInterest] = []
         self._ensure_db_exists()
         self.load()
@@ -83,15 +85,30 @@ class POIDatabase:
         """Create the database file if it doesn't exist."""
         if not self.db_path.exists():
             logger.info(f"Creating planes of interest database at {self.db_path}")
-            self.db_path.write_text("[]")
+            initial_data = {"default": [], "example": []}
+            self.db_path.write_text(json.dumps(initial_data, indent=2))
 
     def load(self):
         """Load planes from the database file."""
         try:
             with open(self.db_path, "r") as f:
                 data = json.load(f)
-                self.planes = [PlaneOfInterest.from_dict(p) for p in data]
-                logger.info(f"Loaded {len(self.planes)} planes of interest")
+
+                # Handle old list format (migrate to new dict format)
+                if isinstance(data, list):
+                    logger.warning("Migrating old POI database format to new dictionary structure")
+                    migrated_data = {"default": data, "example": []}
+                    with open(self.db_path, "w") as fw:
+                        json.dump(migrated_data, fw, indent=2)
+                    data = migrated_data
+
+                # Load from specified category
+                if self.category not in data:
+                    logger.warning(f"Category '{self.category}' not found, creating empty category")
+                    data[self.category] = []
+
+                self.planes = [PlaneOfInterest.from_dict(p) for p in data[self.category]]
+                logger.info(f"Loaded {len(self.planes)} planes of interest from category '{self.category}'")
         except json.JSONDecodeError as e:
             logger.error(f"Error parsing POI database: {e}")
             self.planes = []
@@ -102,10 +119,21 @@ class POIDatabase:
     def save(self):
         """Save planes to the database file."""
         try:
-            data = [p.to_dict() for p in self.planes]
+            # Load all categories first to preserve them
+            with open(self.db_path, "r") as f:
+                all_data = json.load(f)
+
+            # If it's still in old list format, convert it
+            if isinstance(all_data, list):
+                all_data = {"default": all_data, "example": []}
+
+            # Update only our category
+            all_data[self.category] = [p.to_dict() for p in self.planes]
+
+            # Save everything back
             with open(self.db_path, "w") as f:
-                json.dump(data, f, indent=2)
-            logger.info(f"Saved {len(self.planes)} planes of interest")
+                json.dump(all_data, f, indent=2)
+            logger.info(f"Saved {len(self.planes)} planes of interest to category '{self.category}'")
         except Exception as e:
             logger.error(f"Error saving POI database: {e}")
 
@@ -199,3 +227,26 @@ class POIDatabase:
     def get_tailnumber_list(self) -> List[str]:
         """Get a list of all tail numbers."""
         return [p.tailnumber for p in self.planes if p.tailnumber]
+
+    def list_categories(self) -> List[str]:
+        """Get a list of all available categories in the database."""
+        try:
+            with open(self.db_path, "r") as f:
+                data = json.load(f)
+            if isinstance(data, dict):
+                return list(data.keys())
+            return ["default"]
+        except Exception as e:
+            logger.error(f"Error listing categories: {e}")
+            return []
+
+    def switch_category(self, category: str):
+        """
+        Switch to a different category.
+
+        Args:
+            category: The category name to switch to.
+        """
+        self.category = category
+        self.load()
+        logger.info(f"Switched to category '{category}'")

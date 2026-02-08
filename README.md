@@ -121,15 +121,25 @@ cat logs/glycol-*.log | jq 'select(.timestamp > "2026-02-08")'
 
 ## Planes of Interest
 
-Track specific aircraft with custom metadata using the POI database:
+Track specific aircraft with custom metadata using the POI database. The database supports multiple categories (dictionaries) for organizing different groups of aircraft.
 
 ```bash
-# List all tracked planes
+# List all tracked planes (from default category)
 python manage_poi.py list
+
+# List all available categories
+python manage_poi.py categories
+
+# Work with a specific category
+python manage_poi.py --category example list
 
 # Add a plane (only tail number required)
 python manage_poi.py add N12345 --name "My Plane" --icao24 abc123 \
   --model "Cessna 172" --notes "Friend's plane"
+
+# Add a plane to a specific category
+python manage_poi.py --category fighters add N12345 --name "P-51 Mustang" \
+  --model "North American P-51D" --notes "WWII fighter"
 
 # Get plane details
 python manage_poi.py get N12345
@@ -144,12 +154,16 @@ python manage_poi.py remove N12345
 python manage_poi.py --data-dir /path/to/data list
 ```
 
-The database is stored in `glycol/data/planes_of_interest.json` and includes fields for:
+The database is stored in `glycol/data/planes_of_interest.json` as a dictionary of categories. Each category contains a list of aircraft with these fields:
 - **tailnumber** (required) - Aircraft registration
 - **name** (optional) - Aircraft name/identifier
 - **icao24** (optional) - ICAO24 hex address
 - **make_model** (optional) - Aircraft type
 - **notes** (optional) - Additional information
+
+Default categories:
+- **default** - Empty category for your own tracked aircraft
+- **example** - Contains historical aircraft examples
 
 ## Supported Airports
 

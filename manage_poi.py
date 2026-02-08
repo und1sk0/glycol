@@ -114,6 +114,20 @@ def remove_plane(db: POIDatabase, args):
     print(f"Removed plane: {args.tail}")
 
 
+def list_categories(db: POIDatabase):
+    """List all available categories."""
+    categories = db.list_categories()
+    if not categories:
+        print("No categories found")
+        return
+
+    print("\nAvailable categories:")
+    for cat in categories:
+        marker = " (current)" if cat == db.category else ""
+        print(f"  - {cat}{marker}")
+    print()
+
+
 def main():
     parser = argparse.ArgumentParser(description="Manage planes of interest database")
     parser.add_argument(
@@ -122,10 +136,19 @@ def main():
         default=None,
         help="Directory containing data files (defaults to glycol/data/)",
     )
+    parser.add_argument(
+        "--category",
+        dest="category",
+        default="default",
+        help="Category/dictionary to use (defaults to 'default')",
+    )
     subparsers = parser.add_subparsers(dest="command", help="Command to execute")
 
     # List command
     subparsers.add_parser("list", help="List all planes")
+
+    # Categories command
+    subparsers.add_parser("categories", help="List all available categories")
 
     # Add command
     add_parser = subparsers.add_parser("add", help="Add a plane")
@@ -158,11 +181,13 @@ def main():
         sys.exit(1)
 
     # Initialize database
-    db = POIDatabase(data_dir=args.data_dir)
+    db = POIDatabase(data_dir=args.data_dir, category=args.category)
 
     # Execute command
     if args.command == "list":
         list_planes(db)
+    elif args.command == "categories":
+        list_categories(db)
     elif args.command == "add":
         add_plane(db, args)
     elif args.command == "get":
