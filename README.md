@@ -119,51 +119,84 @@ cat logs/glycol-*.log | jq -r '.message'
 cat logs/glycol-*.log | jq 'select(.timestamp > "2026-02-08")'
 ```
 
-## Planes of Interest
+## Database Management
 
-Track specific aircraft with custom metadata using the POI database. The database supports multiple categories (dictionaries) for organizing different groups of aircraft.
+Glycol includes an interactive database manager for tracking planes of interest and aircraft type groups. Run `python manage.py` without arguments to enter interactive mode, or use CLI commands for scripting.
+
+### Interactive Mode
 
 ```bash
-# List all tracked planes (from default category)
-python manage_poi.py list
+# Launch interactive menu
+python manage.py
 
-# List all available categories
-python manage_poi.py categories
-
-# Work with a specific category
-python manage_poi.py --category example list
-
-# Add a plane (only tail number required)
-python manage_poi.py add N12345 --name "My Plane" --icao24 abc123 \
-  --model "Cessna 172" --notes "Friend's plane"
-
-# Add a plane to a specific category
-python manage_poi.py --category fighters add N12345 --name "P-51 Mustang" \
-  --model "North American P-51D" --notes "WWII fighter"
-
-# Get plane details
-python manage_poi.py get N12345
-
-# Update a plane
-python manage_poi.py update N12345 --notes "Updated information"
-
-# Remove a plane
-python manage_poi.py remove N12345
-
-# Use custom data directory
-python manage_poi.py --data-dir /path/to/data list
+# Or explicitly
+python manage.py --interactive
 ```
 
-The database is stored in `glycol/data/planes_of_interest.json` as a dictionary of categories. Each category contains a list of aircraft with these fields:
+The interactive menu provides guided workflows for:
+- **Planes of Interest (POI)** - Track specific aircraft with custom metadata
+- **Aircraft Groups** - Organize aircraft types into categories (passenger, cargo, military, etc.)
+- **Aircraft Glossary** - Browse and search the database of 100+ aircraft type codes
+
+### Planes of Interest (POI)
+
+Track specific aircraft with custom metadata. Supports multiple categories for organizing different collections.
+
+```bash
+# CLI commands
+python manage.py poi list                    # List all tracked planes
+python manage.py poi categories              # List POI categories
+python manage.py --category example poi list # Use specific category
+python manage.py poi add N12345 --name "My Plane" --icao24 abc123 \
+  --model "Cessna 172" --notes "Friend's plane"
+python manage.py poi get N12345              # Get plane details
+```
+
+Database: `glycol/data/planes_of_interest.json`
 - **tailnumber** (required) - Aircraft registration
 - **name** (optional) - Aircraft name/identifier
 - **icao24** (optional) - ICAO24 hex address
 - **make_model** (optional) - Aircraft type
 - **notes** (optional) - Additional information
 
-Default categories:
-- **default** - Empty category for your own tracked aircraft
-- **example** - Contains historical aircraft examples
+### Aircraft Groups
+
+Pre-populated groups of aircraft type codes for filtering operations:
+
+```bash
+# CLI commands
+python manage.py groups list                 # List all groups
+python manage.py groups view passenger       # View passenger aircraft
+python manage.py groups view military_fighter # View military fighters
+```
+
+**Available groups:**
+- **passenger** - Commercial airliners (A380, 777, 737, A320, etc.)
+- **cargo** - Freighter aircraft (747F, 777F, MD-11F, etc.)
+- **military_fighter** - Fighter aircraft (F-16, F-15, F-18, F-22, F-35, etc.)
+- **military_transport** - Military transports (C-130, C-17, KC-135, etc.)
+- **coast_guard** - Coast Guard aircraft
+- **business_jet** - Corporate jets (Gulfstream, Falcon, Citation, etc.)
+- **general_aviation** - GA aircraft (Cessna, Piper, Cirrus, etc.)
+- **helicopter** - Rotary-wing aircraft
+
+### Aircraft Glossary
+
+Searchable database of 100+ aircraft type codes with make, model, and notes:
+
+```bash
+# CLI commands
+python manage.py glossary list               # List all aircraft types
+python manage.py glossary get B77W           # Get specific type
+python manage.py glossary search "737"       # Search by keyword
+```
+
+**Example entries:**
+- **B77W** - Boeing 777-300ER (Long-range wide-body twin-engine)
+- **A388** - Airbus A380-800 (Double-deck wide-body)
+- **F22** - Lockheed Martin F-22 Raptor (Stealth air superiority fighter)
+
+Database: `glycol/data/groups.json`
 
 ## Supported Airports
 
@@ -182,11 +215,13 @@ glycol/
   ui.py                  # Tkinter GUI
   events.py              # Event storage and CSV export
   poi.py                 # Planes of Interest database management
+  groups.py              # Aircraft groups and glossary management
   data/
-    us_airports.json     # Airport database
+    us_airports.json          # Airport database (2000+ US airports)
+    planes_of_interest.json   # POI database
+    groups.json               # Aircraft groups and glossary
 
-glycol.sh                         # Background launcher script
-manage_poi.py                     # CLI for managing planes of interest
-logs/                             # Application logs (JSON format)
-glycol/data/planes_of_interest.json  # POI database
+glycol.sh     # Background launcher script
+manage.py     # Interactive database manager (POI, groups, glossary)
+logs/         # Application logs (JSON format)
 ```
