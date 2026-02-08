@@ -1,0 +1,37 @@
+[
+  {
+    "name": "Spirit of St. Louis",
+    "tailnumber": "N-X-211",
+    "icao24": "",
+    "make_model": "Ryan NYP",
+    "notes": "Lindbergh's transatlantic flight 1927"
+  },
+  {
+    "name": "City of Everett",
+    "tailnumber": "N7470",
+    "icao24": "",
+    "make_model": "Boeing 747-100",
+    "notes": "First 747 ever built, 1968"
+  },
+  {
+    "name": "Clipper America",
+    "tailnumber": "N93119",
+    "icao24": "",
+    "make_model": "Boeing 747-131",
+    "notes": "TWA 800 w/o 1997-07-17"
+  },
+  {
+    "name": "Enola Gay",
+    "tailnumber": "44-86292",
+    "icao24": "",
+    "make_model": "Boeing B-29 Superfortress",
+    "notes": "Hiroshima mission 1945, now at NASM"
+  },
+  {
+    "name": "",
+    "tailnumber": "NC-1",
+    "icao24": "",
+    "make_model": "",
+    "notes": "One of the earliest US aircraft registrations"
+  }
+]
