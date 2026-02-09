@@ -13,7 +13,7 @@ Glycol tracks aircraft around any of 2000+ US airports, automatically detects ta
 ### Real-Time Flight Monitoring
 - Track aircraft within 5 NM radius of any US airport
 - Automatic takeoff and landing event detection
-- Three filtering modes: ICAO24/callsign, category code, or all traffic
+- Three filtering options: aircraft (ICAO24/tail), group, or all traffic
 - Live Tkinter GUI with aircraft table and event log
 - CSV export of recorded events
 - 1500ft altitude ceiling filter for ground traffic
@@ -76,7 +76,7 @@ python -m glycol --airport KSFO
 ./glycol.sh --airport KJFK
 
 # With filtering
-python -m glycol --airport KORD --mode A --filter "ABC123,DEF456"
+python -m glycol --airport KORD --aircraft "ABC123,DEF456"
 ```
 
 ### Managing Databases

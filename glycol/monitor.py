@@ -4,9 +4,10 @@ import datetime
 class AircraftMonitor:
     """Detects takeoff and landing events by tracking on_ground transitions."""
 
-    # Filter modes
+    # Filter modes (internal)
+    # CLI: --aircraft for MODE_A, --group for MODE_B, default for MODE_C
     MODE_A = "A"  # Filter by ICAO24 addresses or callsign/tail numbers
-    MODE_B = "B"  # Filter by aircraft category codes
+    MODE_B = "B"  # Filter by aircraft group names
     MODE_C = "C"  # All traffic
 
     FEET_TO_METERS = 0.3048

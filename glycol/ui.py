@@ -92,20 +92,23 @@ class GlycolApp:
             row=0, column=1, padx=4
         )
 
-        # Mode
-        ttk.Label(frame, text="Mode:").grid(row=0, column=2, sticky=tk.W, padx=(12, 0))
+        # Filter Type
+        ttk.Label(frame, text="Filter:").grid(row=0, column=2, sticky=tk.W, padx=(12, 0))
         self.mode_var = tk.StringVar(value=mode.upper() if mode else "C")
         mode_combo = ttk.Combobox(
             frame,
             textvariable=self.mode_var,
-            values=["A", "B", "C"],
+            values=["All Traffic", "Aircraft", "Group"],
             state="readonly",
-            width=4,
+            width=12,
         )
+        # Map mode to display value
+        mode_display = {"C": "All Traffic", "A": "Aircraft", "B": "Group"}
+        mode_combo.set(mode_display.get(mode.upper() if mode else "C", "All Traffic"))
         mode_combo.grid(row=0, column=3, padx=4)
 
-        # Filter
-        ttk.Label(frame, text="Filter (comma-sep):").grid(
+        # Filter Value
+        ttk.Label(frame, text="Value:").grid(
             row=0, column=4, sticky=tk.W, padx=(12, 0)
         )
         self.filter_var = tk.StringVar(value=filter_text)
@@ -243,7 +246,11 @@ class GlycolApp:
             )
             return
 
-        mode = self.mode_var.get()
+        # Map display value back to mode
+        mode_display = self.mode_var.get()
+        mode_map = {"All Traffic": "C", "Aircraft": "A", "Group": "B"}
+        mode = mode_map.get(mode_display, "C")
+
         filt = [v.strip() for v in self.filter_var.get().split(",") if v.strip()]
         self.monitor.set_filter(mode, filt)
         self.monitor.reset()
@@ -253,7 +260,14 @@ class GlycolApp:
         self._stop_event.clear()
         self.start_btn.config(text="Stop")
         self._set_status(f"Monitoring {airport_name(airport)} ({airport})")
-        self._log(f"--- Started monitoring {airport} (Mode {mode}) ---")
+
+        # Log with clearer filter description
+        if mode == "A":
+            self._log(f"--- Started monitoring {airport} (Filter: Aircraft={','.join(filt) if filt else 'all'}) ---")
+        elif mode == "B":
+            self._log(f"--- Started monitoring {airport} (Filter: Group={','.join(filt) if filt else 'all'}) ---")
+        else:
+            self._log(f"--- Started monitoring {airport} (Filter: All Traffic) ---")
 
         self._poll_thread = threading.Thread(
             target=self._poll_loop, args=(bbox, filt if mode == "A" else None), daemon=True

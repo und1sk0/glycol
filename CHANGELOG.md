@@ -13,10 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Real-time airport flight monitoring using OpenSky Network API
 - Automatic takeoff and landing event detection within 5 NM radius
 - Support for 2000+ US airports (commercial, military, GA, heliports)
-- Three filtering modes:
-  - **Mode A** - Filter by ICAO24 address or callsign
-  - **Mode B** - Filter by aircraft category code
-  - **Mode C** - Monitor all traffic (default)
+- Three filtering options:
+  - **Aircraft filter** (`--aircraft`) - Filter by ICAO24 address or tail number
+  - **Group filter** (`--group`) - Filter by aircraft group name
+  - **All traffic** (default) - Monitor all traffic
 - Tkinter GUI with real-time aircraft table and event log
 - CSV export of recorded events
 - OAuth2 authentication with automatic token refresh
@@ -129,10 +129,10 @@ python -m glycol --airport KSFO
 ./glycol.sh --airport KJFK
 
 # Filter by specific aircraft
-python -m glycol --airport KORD --mode A --filter "A1B2C3,N456CD"
+python -m glycol --airport KORD --aircraft "A1B2C3,N456CD"
 
-# Filter by category (jets)
-python -m glycol --airport KLAX --mode B --filter "7"
+# Filter by aircraft group
+python -m glycol --airport KLAX --group "passenger"
 ```
 
 #### Managing Databases

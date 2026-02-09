@@ -6,10 +6,10 @@ Real-time airport flight monitor built on the [OpenSky Network](https://opensky-
 
 - Monitor aircraft state vectors within a 5 NM radius of 2000+ US airports
 - Automatic detection of takeoff and landing events
-- Three filtering modes:
-  - **Mode A** - Filter by ICAO24 address or callsign
-  - **Mode B** - Filter by aircraft category code
-  - **Mode C** - Monitor all traffic (default)
+- Three filtering options:
+  - **Aircraft filter** (`--aircraft`) - Filter by ICAO24 address or tail number
+  - **Group filter** (`--group`) - Filter by aircraft group name
+  - **All traffic** (default) - Monitor all traffic
 - Tkinter GUI with real-time aircraft table and event log
 - CSV export of recorded events
 - OAuth2 authentication with automatic token refresh
@@ -56,11 +56,11 @@ python -m glycol
 # Specify an airport
 python -m glycol --airport KSFO
 
-# Filter by ICAO24 addresses or callsigns
-python -m glycol --airport KJFK --mode A --filter "A1B2C3,N456CD"
+# Filter by ICAO24 addresses or tail numbers
+python -m glycol --airport KJFK --aircraft "A1B2C3,N456CD"
 
-# Filter by aircraft category
-python -m glycol --airport KORD --mode B --filter "7"
+# Filter by aircraft group
+python -m glycol --airport KORD --group "passenger"
 
 # Specify custom log file
 python -m glycol --airport KSFO --log my-session.log
@@ -92,8 +92,8 @@ If credentials are not found in `glycol/data/credentials.json`, a dialog will pr
 ### GUI Controls
 
 - **Airport ICAO** - Airport code to monitor (e.g. KSFO, KJFK, KLAX)
-- **Mode** - Filter mode (A, B, or C)
-- **Filter** - Comma-separated values for modes A and B
+- **Filter** - Choose between All Traffic, Aircraft, or Group
+- **Value** - Comma-separated ICAO24/tail numbers for Aircraft filter, or group name for Group filter
 - **Poll Interval** - How often to query the API (5-120 seconds, default 10)
 
 The status bar shows authentication state, API rate limit info, and event count. Use the menu to update credentials, save events to CSV, or quit.
