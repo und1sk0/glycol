@@ -6,12 +6,11 @@ from tkinter import ttk, messagebox, filedialog, simpledialog
 
 from glycol.auth import OpenSkyAuth, load_credentials_from_file
 from glycol.api import OpenSkyClient
-from glycol.aircraft import (
-    AIRCRAFT as REG_TO_ICAO24,
-)  # <-- if you export REG_TO_ICAO24, import that instead
+from glycol.aircraft import REG_TO_ICAO24, ICAO24_TO_TYPE
 from glycol.airports import get_bounding_box, airport_name
 from glycol.monitor import AircraftMonitor
 from glycol.events import EventStore
+from glycol.groups import GroupsDatabase
 
 _ICAO24_RE = re.compile(r"^[0-9a-fA-F]{6}$")
 
@@ -41,7 +40,7 @@ class GlycolApp:
         self,
         root: tk.Tk,
         airport: str = "",
-        mode: str = "C",
+        mode: str | None = None,
         filter_text: str = "",
         data_dir: str | None = None,
         logs_dir: str | None = None,
@@ -60,7 +59,8 @@ class GlycolApp:
         # State
         self.auth: OpenSkyAuth | None = None
         self.client: OpenSkyClient | None = None
-        self.monitor = AircraftMonitor()
+        self.groups_db = GroupsDatabase(data_dir=data_dir)
+        self.monitor = AircraftMonitor(filter_mode=None, icao_to_type=ICAO24_TO_TYPE)
         self.store = EventStore()
         self._polling = False
         self._poll_thread: threading.Thread | None = None
@@ -91,6 +91,34 @@ class GlycolApp:
 
     def _parse_filter_values(self) -> list[str]:
         return [v.strip() for v in self.filter_var.get().split(",") if v.strip()]
+
+    def _resolve_group_filter(self, raw_values: list[str]) -> list[str]:
+        """
+        Resolve type group names and individual type codes to a list of type codes.
+
+        Args:
+            raw_values: List of type group names and/or type codes (e.g., ["passenger", "B738"])
+
+        Returns:
+            List of type codes to filter by (e.g., ["A388", "B738", ...])
+        """
+        type_codes: list[str] = []
+
+        for value in raw_values:
+            value_upper = value.strip().upper()
+            if not value_upper:
+                continue
+
+            # Check if it's a type group name (e.g., "passenger", "cargo")
+            group_types = self.groups_db.get_group(value_upper.lower())
+            if group_types:
+                # It's a type group - expand to all type codes in the group
+                type_codes.extend([t.upper() for t in group_types])
+            else:
+                # Assume it's an individual type code
+                type_codes.append(value_upper)
+
+        return self._dedupe_preserve_order(type_codes)
 
     def _resolve_aircraft_filter(
         self, raw_values: list[str]
@@ -149,7 +177,7 @@ class GlycolApp:
         menubar.add_cascade(label="File", menu=file_menu)
         self.root.config(menu=menubar)
 
-    def _build_config_panel(self, airport: str, mode: str, filter_text: str):
+    def _build_config_panel(self, airport: str, mode: str | None, filter_text: str):
         frame = ttk.LabelFrame(self.root, text="Configuration", padding=6)
         frame.pack(fill=tk.X, padx=6, pady=(6, 3))
 
@@ -164,16 +192,17 @@ class GlycolApp:
         ttk.Label(frame, text="Filter:").grid(
             row=0, column=2, sticky=tk.W, padx=(12, 0)
         )
-        self.mode_var = tk.StringVar(value=mode.upper() if mode else "C")
         mode_combo = ttk.Combobox(
             frame,
             textvariable=self.mode_var,
-            values=["All Traffic", "Aircraft", "Group"],
+            values=["All Traffic", "Aircraft", "Type Group"],
             state="readonly",
             width=12,
         )
-        mode_display = {"C": "All Traffic", "A": "Aircraft", "B": "Group"}
-        mode_combo.set(mode_display.get(mode.upper() if mode else "C", "All Traffic"))
+        # Map internal mode to display value
+        mode_display = {None: "All Traffic", "aircraft": "Aircraft", "type_group": "Type Group"}
+        self.mode_var = tk.StringVar(value=mode_display.get(mode, "All Traffic"))
+        mode_combo.config(textvariable=self.mode_var)
         mode_combo.grid(row=0, column=3, padx=4)
 
         # Filter Value
@@ -320,9 +349,10 @@ class GlycolApp:
             )
             return
 
+        # Map display value to internal filter mode
         mode_display = self.mode_var.get()
-        mode_map = {"All Traffic": "C", "Aircraft": "A", "Group": "B"}
-        mode = mode_map.get(mode_display, "C")
+        display_to_mode = {"All Traffic": None, "Aircraft": "aircraft", "Type Group": "type_group"}
+        filter_mode = display_to_mode.get(mode_display)
 
         raw_filt = self._parse_filter_values()
 
@@ -330,12 +360,15 @@ class GlycolApp:
         api_icao24_filter: list[str] | None = None
         filt_for_monitor: list[str] = raw_filt
 
-        if mode == "A":
+        if filter_mode == "aircraft":
             api_icao24_filter, filt_for_monitor = self._resolve_aircraft_filter(
                 raw_filt
             )
+        elif filter_mode == "type_group":
+            # Resolve type group names to type codes
+            filt_for_monitor = self._resolve_group_filter(raw_filt)
 
-        self.monitor.set_filter(mode, filt_for_monitor)
+        self.monitor.set_filter(filter_mode, filt_for_monitor)
         self.monitor.reset()
         self.store = EventStore(airport=airport)
 
@@ -344,20 +377,20 @@ class GlycolApp:
         self.start_btn.config(text="Stop")
         self._set_status(f"Monitoring {airport_name(airport)} ({airport})")
 
-        if mode == "A":
+        if filter_mode == "aircraft":
             self._log(
                 f"--- Started monitoring {airport} (Filter: Aircraft={','.join(raw_filt) if raw_filt else 'all'}) ---"
             )
-        elif mode == "B":
+        elif filter_mode == "type_group":
             self._log(
-                f"--- Started monitoring {airport} (Filter: Group={','.join(raw_filt) if raw_filt else 'all'}) ---"
+                f"--- Started monitoring {airport} (Filter: Type Group={','.join(raw_filt) if raw_filt else 'all'}) ---"
             )
         else:
             self._log(f"--- Started monitoring {airport} (Filter: All Traffic) ---")
 
         self._poll_thread = threading.Thread(
             target=self._poll_loop,
-            args=(bbox, api_icao24_filter if mode == "A" else None),
+            args=(bbox, api_icao24_filter if filter_mode == "aircraft" else None),
             daemon=True,
         )
         self._poll_thread.start()
@@ -481,7 +514,7 @@ def run_app(
     data_dir: str | None = None,
     filter_text: str = "",
     logs_dir: str | None = None,
-    mode: str = "C",
+    mode: str | None = None,
     poll_interval: int = 30,
 ):
     root = tk.Tk()

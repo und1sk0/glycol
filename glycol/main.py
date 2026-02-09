@@ -102,7 +102,7 @@ def main():
         "--group",
         dest="group_filter",
         default="",
-        help="Filter by aircraft group name",
+        help="Filter by aircraft type group name (e.g., passenger, cargo) or type codes",
     )
 
     parser.add_argument(
@@ -132,15 +132,15 @@ def main():
     )
     args = parser.parse_args()
 
-    # Determine mode and filter from new flags
+    # Determine filter mode and filter text from CLI flags
     if args.aircraft_filter:
-        mode = "A"
+        mode = "aircraft"
         filter_text = args.aircraft_filter
     elif args.group_filter:
-        mode = "B"
+        mode = "type_group"
         filter_text = args.group_filter
     else:
-        mode = "C"
+        mode = None
         filter_text = ""
 
     # Set up logging

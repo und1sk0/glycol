@@ -8,7 +8,7 @@ Real-time airport flight monitor built on the [OpenSky Network](https://opensky-
 - Automatic detection of takeoff and landing events
 - Three filtering options:
   - **Aircraft filter** (`--aircraft`) - Filter by ICAO24 address or tail number
-  - **Group filter** (`--group`) - Filter by aircraft group name
+  - **Type group filter** (`--group`) - Filter by aircraft type group name (passenger, cargo, etc.)
   - **All traffic** (default) - Monitor all traffic
 - Tkinter GUI with real-time aircraft table and event log
 - CSV export of recorded events
@@ -59,7 +59,7 @@ python -m glycol --airport KSFO
 # Filter by ICAO24 addresses or tail numbers
 python -m glycol --airport KJFK --aircraft "A1B2C3,N456CD"
 
-# Filter by aircraft group
+# Filter by aircraft type group
 python -m glycol --airport KORD --group "passenger"
 
 # Specify custom log file
@@ -92,8 +92,8 @@ If credentials are not found in `glycol/data/credentials.json`, a dialog will pr
 ### GUI Controls
 
 - **Airport ICAO** - Airport code to monitor (e.g. KSFO, KJFK, KLAX)
-- **Filter** - Choose between All Traffic, Aircraft, or Group
-- **Value** - Comma-separated ICAO24/tail numbers for Aircraft filter, or group name for Group filter
+- **Filter** - Choose between All Traffic, Aircraft, or Type Group
+- **Value** - Comma-separated ICAO24/tail numbers for Aircraft filter, or type group name for Type Group filter
 - **Poll Interval** - How often to query the API (5-120 seconds, default 10)
 
 The status bar shows authentication state, API rate limit info, and event count. Use the menu to update credentials, save events to CSV, or quit.
@@ -135,7 +135,7 @@ python manage.py --interactive
 
 The interactive menu provides guided workflows for:
 - **Planes of Interest (POI)** - Track specific aircraft with custom metadata
-- **Aircraft Groups** - Organize aircraft types into categories (passenger, cargo, military, etc.)
+- **Type Groups** - Organize aircraft types into categories (passenger, cargo, military, etc.)
 - **Aircraft Glossary** - Browse and search the database of 100+ aircraft type codes
 
 ### Planes of Interest (POI)
@@ -159,18 +159,18 @@ Database: `glycol/data/planes_of_interest.json`
 - **make_model** (optional) - Aircraft type
 - **notes** (optional) - Additional information
 
-### Aircraft Groups
+### Type Groups
 
-Pre-populated groups of aircraft type codes for filtering operations:
+Pre-populated type groups of aircraft type codes for filtering operations:
 
 ```bash
 # CLI commands
-python manage.py groups list                 # List all groups
-python manage.py groups view passenger       # View passenger aircraft
-python manage.py groups view military_fighter # View military fighters
+python manage.py groups list                 # List all type groups
+python manage.py groups view passenger       # View passenger aircraft type codes
+python manage.py groups view military_fighter # View military fighter type codes
 ```
 
-**Available groups:**
+**Available type groups:**
 - **passenger** - Commercial airliners (A380, 777, 737, A320, etc.)
 - **cargo** - Freighter aircraft (747F, 777F, MD-11F, etc.)
 - **military_fighter** - Fighter aircraft (F-16, F-15, F-18, F-22, F-35, etc.)
@@ -215,13 +215,13 @@ glycol/
   ui.py                  # Tkinter GUI
   events.py              # Event storage and CSV export
   poi.py                 # Planes of Interest database management
-  groups.py              # Aircraft groups and glossary management
+  groups.py              # Aircraft type groups and glossary management
   data/
     us_airports.json          # Airport database (2000+ US airports)
     planes_of_interest.json   # POI database
-    groups.json               # Aircraft groups and glossary
+    groups.json               # Aircraft type groups and glossary
 
 glycol.sh     # Background launcher script
-manage.py     # Interactive database manager (POI, groups, glossary)
+manage.py     # Interactive database manager (POI, type groups, glossary)
 logs/         # Application logs (JSON format)
 ```

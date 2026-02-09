@@ -4,46 +4,62 @@ import datetime
 class AircraftMonitor:
     """Detects takeoff and landing events by tracking on_ground transitions."""
 
-    # Filter modes (internal)
-    # CLI: --aircraft for MODE_A, --group for MODE_B, default for MODE_C
-    MODE_A = "A"  # Filter by ICAO24 addresses or callsign/tail numbers
-    MODE_B = "B"  # Filter by aircraft group names
-    MODE_C = "C"  # All traffic
-
     FEET_TO_METERS = 0.3048
 
     def __init__(
         self,
-        mode: str = "C",
+        filter_mode: str | None = None,
         filter_values: list[str] | None = None,
         ceiling_ft: float | None = 1500,
+        icao_to_type: dict[str, str] | None = None,
     ):
-        self.mode = mode.upper()
+        """
+        Initialize the aircraft monitor.
+
+        Args:
+            filter_mode: Filter mode - "aircraft", "type_group", or None (all traffic)
+            filter_values: List of values to filter by (depends on filter_mode)
+            ceiling_ft: Maximum altitude in feet to track (None = no ceiling)
+            icao_to_type: ICAO24 -> type code mapping for type group filtering
+        """
+        self.filter_mode = filter_mode
         self.filter_values: list[str] = [
             v.strip().upper() for v in (filter_values or [])
         ]
         self.ceiling_m: float | None = (
             ceiling_ft * self.FEET_TO_METERS if ceiling_ft is not None else None
         )
+        self.icao_to_type: dict[str, str] = icao_to_type or {}
         # icao24 -> on_ground (bool)
         self._prev_states: dict[str, bool] = {}
 
-    def set_filter(self, mode: str, filter_values: list[str] | None = None):
-        self.mode = mode.upper()
+    def set_filter(self, filter_mode: str | None, filter_values: list[str] | None = None):
+        """Update the filter configuration."""
+        self.filter_mode = filter_mode
         self.filter_values = [v.strip().upper() for v in (filter_values or [])]
 
     def _matches_filter(self, state: dict) -> bool:
-        if self.mode == self.MODE_C:
+        """Check if an aircraft state matches the current filter."""
+        # No filter - all traffic
+        if self.filter_mode is None:
             return True
-        if self.mode == self.MODE_A:
+
+        # Aircraft filter - match by ICAO24, callsign, or tail number
+        if self.filter_mode == "aircraft":
             icao24 = (state.get("icao24") or "").upper()
             callsign = (state.get("callsign") or "").upper()
             return icao24 in self.filter_values or callsign in self.filter_values
-        if self.mode == self.MODE_B:
-            cat = state.get("category")
-            if cat is not None:
-                return str(cat) in self.filter_values
+
+        # Type group filter - match by aircraft type code
+        if self.filter_mode == "type_group":
+            # Look up aircraft type code from ICAO24
+            icao24 = (state.get("icao24") or "").lower()
+            type_code = self.icao_to_type.get(icao24)
+            if type_code:
+                return type_code.upper() in self.filter_values
             return False
+
+        # Unknown filter mode - default to allow
         return True
 
     def process_states(self, states: list[dict]) -> list[dict]:

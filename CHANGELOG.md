@@ -5,12 +5,77 @@ All notable changes to Glycol will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-02-08
+
+### Added
+
+#### Aircraft Type Code Filtering
+- **ICAO24 → Type Code Mapping** - Integrated ADS-B Exchange aircraft database with 488,320+ type code mappings
+- **Type Group Filter** - Filter aircraft by type groups (passenger, cargo, military, etc.) or individual type codes
+- **Automatic Database Download** - Aircraft database downloaded automatically on first run
+- **Smart Type Resolution** - Resolves type group names to lists of type codes (e.g., "passenger" → 26 aircraft types)
+- **Mixed Filter Support** - Combine type groups and individual codes (e.g., "passenger,F22,B738")
+
+#### Enhanced Aircraft Filter
+- **Tail Number → ICAO24 Conversion** - Automatically converts registration numbers to ICAO24 for API filtering
+- **REG_TO_ICAO24 Mapping** - 613,253 registration-to-ICAO24 mappings from ADS-B Exchange
+- **Intelligent Filter Resolution** - Detects ICAO24 hex codes, tail numbers, and callsigns automatically
+- **API Filter Optimization** - Only sends ICAO24 codes to OpenSky API, filters callsigns locally
+
+### Changed
+
+#### Code Refactoring & Clarity
+- **Filter Mode Naming** - Removed cryptic MODE_A/B/C in favor of clear names:
+  - `None` (all traffic)
+  - `"aircraft"` (specific aircraft)
+  - `"type_group"` (aircraft types)
+- **Terminology Standardization** - "Group" → "Type Group" throughout UI and documentation to avoid confusion with OpenSky API fields
+- **Module Organization** - New `aircraft.py` module for aircraft data management
+- **Type Hints Improved** - Better type annotations for filter modes and parameters
+
+### Fixed
+- **Download User-Agent** - Added User-Agent header to ADS-B Exchange downloads to prevent 403 errors
+- **Filter Resolution** - Proper separation of API filters (ICAO24 only) vs. local filters (ICAO24 + callsigns)
+
+### Technical Details
+
+#### New Files
+- `glycol/aircraft.py` - Aircraft database management and lookups
+- `glycol/data/basic-ac-db.json.gz` - ADS-B Exchange aircraft database (auto-downloaded)
+
+#### Updated Files
+- `glycol/monitor.py` - Refactored filter modes, added type code filtering
+- `glycol/ui.py` - Type group resolution, improved filter logic
+- `glycol/main.py` - Updated mode naming
+- `README.md` - Updated terminology and documentation
+
+#### Database Statistics
+- **613,253** registration → ICAO24 mappings
+- **488,320** ICAO24 → type code mappings
+- **100+** aircraft types in glossary
+- **8** pre-defined type groups
+
+## [1.1.2] - 2026-02-08
+
+### Added
+- **`--interval` CLI Flag** - Set polling interval from command line (5-120 seconds)
+- **UI Poll Control** - Adjustable poll interval via GUI spinbox
+- **Default Changed** - Poll interval default changed from 10s to 30s
+
 ## [1.1.1] - 2026-02-08
 
 ### Fixed
 - `glycol.sh -h` does not launch into the background; it prints the help docstring and exits
+- Changelog version drift corrected
 
 ## [1.1.0] - 2026-02-08
+
+### Changed
+- **Improved Filter Mode Terminology** - Made filtering modes more intuitive in UI and CLI
+- **Enhanced Mode Selection** - Better display names for filter types in GUI dropdown
+- **Documentation Updates** - Clarified filter mode usage in README and release notes
+
+## [1.0.0] - 2026-02-08
 
 ### Added
 
@@ -26,7 +91,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CSV export of recorded events
 - OAuth2 authentication with automatic token refresh
 - API rate limit handling with exponential backoff
-- Altitude ceiling filter (1500ft) for ground traffic detection
 
 #### Background Operations
 - **Background launcher script** (`glycol.sh`) for daemonized execution
@@ -72,13 +136,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   2. **Aircraft Groups** - Browse and manage type groups
   3. **Aircraft Glossary** - Search and explore aircraft types
 
-- **CLI mode** for scripting and automation:
-  ```bash
-  python manage.py poi list
-  python manage.py groups view passenger
-  python manage.py glossary search "737"
-  ```
-
+- **CLI mode** for scripting and automation
 - Features:
   - Numeric or text-based menu selection
   - Confirmation prompts for destructive operations
@@ -87,120 +145,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Search functionality for glossary
   - Group and aircraft type management
 
-### Database Files
+## [0.1.1] - 2026-02-08
 
-- `glycol/data/us_airports.json` - 2000+ US airport database
-- `glycol/data/planes_of_interest.json` - POI database with categories
-- `glycol/data/groups.json` - Aircraft groups and type glossary
-- `glycol/data/credentials.json` - OAuth2 credentials (user-created)
+### Fixed
+- Documentation files that weren't committed in initial release
 
-### Project Structure
+## [0.1.0] - 2026-02-08
 
-```
-glycol/
-  __main__.py            # Entry point
-  main.py                # CLI argument parsing and logging setup
-  api.py                 # OpenSky REST API client
-  auth.py                # OAuth2 token management
-  monitor.py             # Takeoff/landing event detection
-  airports.py            # Airport database and bounding box math
-  ui.py                  # Tkinter GUI
-  events.py              # Event storage and CSV export
-  poi.py                 # Planes of Interest database management
-  groups.py              # Aircraft groups and glossary management
-  data/                  # Data files (airports, POI, groups, credentials)
-
-glycol.sh     # Background launcher script
-manage.py     # Interactive database manager
-logs/         # Application logs (JSON format)
-```
-
-### Requirements
-
-- Python 3.10+
-- OpenSky Network account with OAuth2 credentials
-- tkinter (included with most Python installations)
-- Dependencies: requests, requests-oauthlib (see requirements.txt)
-
-### Usage Examples
-
-#### Running Glycol
-
-```bash
-# Foreground with GUI
-python -m glycol --airport KSFO
-
-# Background with launcher
-./glycol.sh --airport KJFK
-
-# Filter by specific aircraft
-python -m glycol --airport KORD --aircraft "A1B2C3,N456CD"
-
-# Filter by aircraft group
-python -m glycol --airport KLAX --group "passenger"
-```
-
-#### Managing Databases
-
-```bash
-# Interactive mode
-python manage.py
-
-# CLI mode - POI
-python manage.py poi list
-python manage.py --category example poi list
-python manage.py poi add N12345 --name "My Plane"
-
-# CLI mode - Groups
-python manage.py groups list
-python manage.py groups view passenger
-
-# CLI mode - Glossary
-python manage.py glossary search "Boeing"
-python manage.py glossary get B77W
-```
-
-#### Log Analysis
-
-```bash
-# View all ERROR level logs
-cat logs/glycol-*.log | jq 'select(.level == "ERROR")'
-
-# Extract just messages
-cat logs/glycol-*.log | jq -r '.message'
-
-# Filter by timestamp
-cat logs/glycol-*.log | jq 'select(.timestamp > "2026-02-08")'
-```
-
-### Documentation
-
-- README.md - Comprehensive usage guide
-- CHANGELOG.md - Version history and release notes
-- Inline code documentation with docstrings
-
-### Known Limitations
-
-- OpenSky API rate limits (10 requests per 10 seconds for authenticated users)
-- 5 NM radius limitation for airport monitoring
-- US airports only (ICAO-coded airports in US and territories)
-- Requires active internet connection
-- Tkinter GUI dependency
-
-### Attribution
-
-- Airport data sourced from [OurAirports](https://ourairports.com/)
-- Flight data from [OpenSky Network](https://opensky-network.org/)
-- Aircraft type codes based on ICAO standards
+### Added
+- Initial OpenSky airport monitor implementation
+- Support for 2000+ US airports from OurAirports dataset
+- 1500ft altitude ceiling filter for ground traffic
+- Basic GUI with aircraft table and event log
+- OAuth2 authentication
+- CSV event export
+- Project README and documentation
 
 ---
 
 ## Release Information
 
-**Version:** 1.1.1
+**Version:** 1.2.0
 **Release Date:** February 8, 2026
 **Status:** Stable
-**License:** MIT (if applicable)
 
 **Contributors:**
 - Initial development and feature implementation
@@ -208,6 +175,7 @@ cat logs/glycol-*.log | jq 'select(.timestamp > "2026-02-08")'
 **Special Thanks:**
 - OpenSky Network for providing free API access
 - OurAirports for comprehensive airport database
+- ADS-B Exchange for aircraft database
 
 ---
 
