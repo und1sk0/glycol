@@ -10,12 +10,12 @@ __author__ = "Glycol Project"
 __license__ = "MIT"
 
 from glycol.poi import POIDatabase, PlaneOfInterest
-from glycol.groups import GroupsDatabase, AircraftType
+from glycol.typegroups import TypeGroupsDatabase, AircraftType
 
 __all__ = [
     "POIDatabase",
     "PlaneOfInterest",
-    "GroupsDatabase",
+    "TypeGroupsDatabase",
     "AircraftType",
     "__version__",
 ]

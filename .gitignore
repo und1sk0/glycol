@@ -31,6 +31,7 @@ Thumbs.db
 # Credentials and secrets
 credentials.json
 glycol/data/credentials.json
+glycol/data/*gz
 
 # Application logs
 logs/

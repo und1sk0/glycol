@@ -13,6 +13,7 @@ class JsonFormatter(logging.Formatter):
     """
     Custom formatter that outputs log records as JSON.
     """
+
     def format(self, record: logging.LogRecord) -> str:
         log_data = {
             "timestamp": datetime.fromtimestamp(record.created).isoformat(),
@@ -70,24 +71,19 @@ def setup_logging(log_file: str = None, logs_dir: str = None) -> str:
     json_formatter = JsonFormatter()
     console_formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
 
-    file_handler = logging.FileHandler(log_path, mode='a')
+    file_handler = logging.FileHandler(log_path, mode="a")
     file_handler.setFormatter(json_formatter)
 
     console_handler = logging.StreamHandler()
     console_handler.setFormatter(console_formatter)
 
-    logging.basicConfig(
-        level=logging.INFO,
-        handlers=[file_handler, console_handler]
-    )
+    logging.basicConfig(level=logging.INFO, handlers=[file_handler, console_handler])
 
     return str(log_path)
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="Glycol - OpenSky Airport Monitor"
-    )
+    parser = argparse.ArgumentParser(description="Glycol - OpenSky Airport Monitor")
     parser.add_argument(
         "--airport",
         default="",
@@ -100,7 +96,7 @@ def main():
         "--aircraft",
         dest="aircraft_filter",
         default="",
-        help="Filter by ICAO24 address or tail number (comma-separated)",
+        help="Filter by ICAO24 or tail number",
     )
     filter_group.add_argument(
         "--group",
@@ -151,9 +147,13 @@ def main():
     log_path = setup_logging(args.log_file, args.logs_dir)
     logging.info(f"Glycol starting - logging to {log_path}")
     if args.aircraft_filter:
-        logging.info(f"Airport: {args.airport or 'Not set'}, Filter: aircraft={args.aircraft_filter}")
+        logging.info(
+            f"Airport: {args.airport or 'Not set'}, Filter: aircraft={args.aircraft_filter}"
+        )
     elif args.group_filter:
-        logging.info(f"Airport: {args.airport or 'Not set'}, Filter: group={args.group_filter}")
+        logging.info(
+            f"Airport: {args.airport or 'Not set'}, Filter: group={args.group_filter}"
+        )
     else:
         logging.info(f"Airport: {args.airport or 'Not set'}, Filter: all traffic")
     if args.data_dir:

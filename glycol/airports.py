@@ -5,10 +5,12 @@ from pathlib import Path
 # ICAO code -> (latitude, longitude, name)
 _DATA_FILE = Path(__file__).resolve().parent / "data" / "us_airports.json"
 
+
 def _load_airports() -> dict[str, tuple[float, float, str]]:
     with open(_DATA_FILE) as f:
         raw = json.load(f)
     return {code: (v[0], v[1], v[2]) for code, v in raw.items()}
+
 
 AIRPORTS: dict[str, tuple[float, float, str]] = _load_airports()
 

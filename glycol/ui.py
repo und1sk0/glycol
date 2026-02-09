@@ -1,13 +1,19 @@
+import datetime
+import re
 import threading
 import tkinter as tk
 from tkinter import ttk, messagebox, filedialog, simpledialog
-import datetime
 
 from glycol.auth import OpenSkyAuth, load_credentials_from_file
 from glycol.api import OpenSkyClient
-from glycol.airports import get_bounding_box, airport_name, AIRPORTS
+from glycol.aircraft import (
+    AIRCRAFT as REG_TO_ICAO24,
+)  # <-- if you export REG_TO_ICAO24, import that instead
+from glycol.airports import get_bounding_box, airport_name
 from glycol.monitor import AircraftMonitor
 from glycol.events import EventStore
+
+_ICAO24_RE = re.compile(r"^[0-9a-fA-F]{6}$")
 
 
 class CredentialsDialog(simpledialog.Dialog):
@@ -31,8 +37,16 @@ class CredentialsDialog(simpledialog.Dialog):
 class GlycolApp:
     """Main Tkinter application for Glycol airport monitoring."""
 
-    def __init__(self, root: tk.Tk, airport: str = "", mode: str = "C", filter_text: str = "", data_dir: str = None,
-                 logs_dir: str = None, poll_interval=30):
+    def __init__(
+        self,
+        root: tk.Tk,
+        airport: str = "",
+        mode: str = "C",
+        filter_text: str = "",
+        data_dir: str | None = None,
+        logs_dir: str | None = None,
+        poll_interval: int = 30,
+    ):
         self.poll_interval = poll_interval
         self.root = root
         self.root.title("Glycol - OpenSky Airport Monitor")
@@ -61,12 +75,74 @@ class GlycolApp:
         # Try to load credentials automatically, prompt if not found
         self.root.after(200, self._auto_authenticate)
 
+    # -------------------------
+    # Filter resolution (FIX)
+    # -------------------------
+
+    @staticmethod
+    def _dedupe_preserve_order(values: list[str]) -> list[str]:
+        seen: set[str] = set()
+        out: list[str] = []
+        for v in values:
+            if v not in seen:
+                seen.add(v)
+                out.append(v)
+        return out
+
+    def _parse_filter_values(self) -> list[str]:
+        return [v.strip() for v in self.filter_var.get().split(",") if v.strip()]
+
+    def _resolve_aircraft_filter(
+        self, raw_values: list[str]
+    ) -> tuple[list[str] | None, list[str]]:
+        """
+        Returns (api_icao24_filter, monitor_filter_values).
+
+        - api_icao24_filter: ONLY ICAO24 hex strings (lowercased) safe to pass to OpenSky.
+                            None means "do not API-filter; fetch all in bbox and filter locally."
+        - monitor_filter_values: what the monitor should match against (ICAO24 + callsign + reg),
+                                 normalized reasonably.
+        """
+        api_icao24: list[str] = []
+        monitor_values: list[str] = []
+
+        for token in raw_values:
+            t = token.strip()
+            if not t:
+                continue
+
+            # 1) ICAO24 hex directly
+            if _ICAO24_RE.match(t):
+                api_icao24.append(t.lower())
+                monitor_values.append(t.lower())
+                continue
+
+            # 2) Try registration (tail) -> ICAO24 via local mapping
+            reg = t.upper()
+            monitor_values.append(reg)
+
+            icao = REG_TO_ICAO24.get(reg)
+            if isinstance(icao, str) and icao:
+                api_icao24.append(icao.lower())
+                monitor_values.append(icao.lower())
+                continue
+
+            # 3) Otherwise treat as callsign (matched locally by monitor)
+            monitor_values.append(reg)
+
+        api_icao24 = self._dedupe_preserve_order(api_icao24)
+        monitor_values = self._dedupe_preserve_order(monitor_values)
+
+        return (api_icao24 or None), monitor_values
+
     # ---- UI construction ----
 
     def _build_menu(self):
         menubar = tk.Menu(self.root)
         file_menu = tk.Menu(menubar, tearoff=0)
-        file_menu.add_command(label="Set Credentials...", command=self._prompt_credentials)
+        file_menu.add_command(
+            label="Set Credentials...", command=self._prompt_credentials
+        )
         file_menu.add_command(label="Save CSV...", command=self._save_csv)
         file_menu.add_separator()
         file_menu.add_command(label="Quit", command=self._on_close)
@@ -85,7 +161,9 @@ class GlycolApp:
         )
 
         # Filter Type
-        ttk.Label(frame, text="Filter:").grid(row=0, column=2, sticky=tk.W, padx=(12, 0))
+        ttk.Label(frame, text="Filter:").grid(
+            row=0, column=2, sticky=tk.W, padx=(12, 0)
+        )
         self.mode_var = tk.StringVar(value=mode.upper() if mode else "C")
         mode_combo = ttk.Combobox(
             frame,
@@ -94,15 +172,12 @@ class GlycolApp:
             state="readonly",
             width=12,
         )
-        # Map mode to display value
         mode_display = {"C": "All Traffic", "A": "Aircraft", "B": "Group"}
         mode_combo.set(mode_display.get(mode.upper() if mode else "C", "All Traffic"))
         mode_combo.grid(row=0, column=3, padx=4)
 
         # Filter Value
-        ttk.Label(frame, text="Value:").grid(
-            row=0, column=4, sticky=tk.W, padx=(12, 0)
-        )
+        ttk.Label(frame, text="Value:").grid(row=0, column=4, sticky=tk.W, padx=(12, 0))
         self.filter_var = tk.StringVar(value=filter_text)
         ttk.Entry(frame, textvariable=self.filter_var, width=30).grid(
             row=0, column=5, padx=4
@@ -125,8 +200,19 @@ class GlycolApp:
         frame = ttk.LabelFrame(self.root, text="Aircraft in Range", padding=4)
         frame.pack(fill=tk.BOTH, expand=True, padx=6, pady=3)
 
-        cols = ("icao24", "callsign", "alt_m", "speed_ms", "heading", "vrate", "on_ground", "category", "country")
+        cols = (
+            "icao24",
+            "callsign",
+            "alt_m",
+            "speed_ms",
+            "heading",
+            "vrate",
+            "on_ground",
+            "category",
+            "country",
+        )
         self.tree = ttk.Treeview(frame, columns=cols, show="headings", height=10)
+
         headings = {
             "icao24": "ICAO24",
             "callsign": "Callsign",
@@ -178,7 +264,6 @@ class GlycolApp:
     # ---- Credentials ----
 
     def _auto_authenticate(self):
-        """Try to load credentials from file, prompt if not found."""
         credentials = load_credentials_from_file(data_dir=self.data_dir)
         if credentials:
             client_id, client_secret = credentials
@@ -186,7 +271,6 @@ class GlycolApp:
             self._set_status("Authenticating with saved credentials...")
             threading.Thread(target=self._do_auth, daemon=True).start()
         else:
-            # No credentials file found, prompt user
             self._prompt_credentials()
 
     def _prompt_credentials(self):
@@ -198,7 +282,6 @@ class GlycolApp:
                 return
             self.auth = OpenSkyAuth(client_id, client_secret)
             self._set_status("Authenticating...")
-            # Authenticate in a thread to avoid blocking UI
             threading.Thread(target=self._do_auth, daemon=True).start()
 
     def _do_auth(self):
@@ -208,8 +291,7 @@ class GlycolApp:
             self.root.after(0, lambda: self._set_status("Authenticated"))
         else:
             self.root.after(
-                0,
-                lambda: self._set_status("Authentication failed - check credentials"),
+                0, lambda: self._set_status("Authentication failed - check credentials")
             )
 
     # ---- Polling control ----
@@ -238,13 +320,22 @@ class GlycolApp:
             )
             return
 
-        # Map display value back to mode
         mode_display = self.mode_var.get()
         mode_map = {"All Traffic": "C", "Aircraft": "A", "Group": "B"}
         mode = mode_map.get(mode_display, "C")
 
-        filt = [v.strip() for v in self.filter_var.get().split(",") if v.strip()]
-        self.monitor.set_filter(mode, filt)
+        raw_filt = self._parse_filter_values()
+
+        # Compute the API filter and the monitor filter separately.
+        api_icao24_filter: list[str] | None = None
+        filt_for_monitor: list[str] = raw_filt
+
+        if mode == "A":
+            api_icao24_filter, filt_for_monitor = self._resolve_aircraft_filter(
+                raw_filt
+            )
+
+        self.monitor.set_filter(mode, filt_for_monitor)
         self.monitor.reset()
         self.store = EventStore(airport=airport)
 
@@ -253,16 +344,21 @@ class GlycolApp:
         self.start_btn.config(text="Stop")
         self._set_status(f"Monitoring {airport_name(airport)} ({airport})")
 
-        # Log with clearer filter description
         if mode == "A":
-            self._log(f"--- Started monitoring {airport} (Filter: Aircraft={','.join(filt) if filt else 'all'}) ---")
+            self._log(
+                f"--- Started monitoring {airport} (Filter: Aircraft={','.join(raw_filt) if raw_filt else 'all'}) ---"
+            )
         elif mode == "B":
-            self._log(f"--- Started monitoring {airport} (Filter: Group={','.join(filt) if filt else 'all'}) ---")
+            self._log(
+                f"--- Started monitoring {airport} (Filter: Group={','.join(raw_filt) if raw_filt else 'all'}) ---"
+            )
         else:
             self._log(f"--- Started monitoring {airport} (Filter: All Traffic) ---")
 
         self._poll_thread = threading.Thread(
-            target=self._poll_loop, args=(bbox, filt if mode == "A" else None), daemon=True
+            target=self._poll_loop,
+            args=(bbox, api_icao24_filter if mode == "A" else None),
+            daemon=True,
         )
         self._poll_thread.start()
 
@@ -281,24 +377,23 @@ class GlycolApp:
                 states = self.client.get_states(bbox, icao24_filter=icao24_filter)
                 events = self.monitor.process_states(states)
 
-                # Record significant events
                 for ev in events:
                     if ev["type"] in ("takeoff", "landing"):
                         self.store.record_event(ev)
 
-                # Schedule UI update on the main thread
                 self.root.after(0, self._update_ui, states, events)
             except Exception as exc:
                 self.root.after(0, self._log, f"Poll error: {exc}")
 
             self._stop_event.wait(timeout=self.poll_var.get())
 
-    # ---- UI updates (called on main thread) ----
+    # ---- UI updates ----
 
     def _update_ui(self, states: list[dict], events: list[dict]):
         self._update_table(states)
         for ev in events:
             self._log_event(ev)
+
         rl = self.client.rate_limit_remaining if self.client else "?"
         now = datetime.datetime.now().strftime("%H:%M:%S")
         airport = self.airport_var.get().strip().upper()
@@ -311,16 +406,17 @@ class GlycolApp:
     def _update_table(self, states: list[dict]):
         for item in self.tree.get_children():
             self.tree.delete(item)
+
         for s in states:
-            # Apply the same filter the monitor uses
             if not self.monitor._matches_filter(s):
                 continue
+
             self.tree.insert(
                 "",
                 tk.END,
                 values=(
                     s.get("icao24", ""),
-                    s.get("callsign", ""),
+                    (s.get("callsign") or "").strip(),
                     _fmt(s.get("baro_altitude")),
                     _fmt(s.get("velocity")),
                     _fmt(s.get("true_track")),
@@ -382,9 +478,9 @@ def _fmt(val) -> str:
 
 def run_app(
     airport: str = "",
-    data_dir: str = None,
+    data_dir: str | None = None,
     filter_text: str = "",
-    logs_dir: str = None,
+    logs_dir: str | None = None,
     mode: str = "C",
     poll_interval: int = 30,
 ):

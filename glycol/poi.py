@@ -22,11 +22,13 @@ class PlaneOfInterest:
         name: str = "",
         icao24: str = "",
         make_model: str = "",
-        notes: str = ""
+        notes: str = "",
     ):
         self.tailnumber = tailnumber.upper()  # Tail numbers typically uppercase
         self.name = name
-        self.icao24 = icao24.lower() if icao24 else ""  # ICAO24 addresses are case-insensitive
+        self.icao24 = (
+            icao24.lower() if icao24 else ""
+        )  # ICAO24 addresses are case-insensitive
         self.make_model = make_model
         self.notes = notes
 
@@ -37,7 +39,7 @@ class PlaneOfInterest:
             "tailnumber": self.tailnumber,
             "icao24": self.icao24,
             "make_model": self.make_model,
-            "notes": self.notes
+            "notes": self.notes,
         }
 
     @classmethod
@@ -48,7 +50,7 @@ class PlaneOfInterest:
             name=data.get("name", ""),
             icao24=data.get("icao24", ""),
             make_model=data.get("make_model", ""),
-            notes=data.get("notes", "")
+            notes=data.get("notes", ""),
         )
 
     def __repr__(self):
@@ -58,7 +60,12 @@ class PlaneOfInterest:
 class POIDatabase:
     """Manages the planes of interest database."""
 
-    def __init__(self, db_path: Optional[Path] = None, data_dir: Optional[Path] = None, category: str = "default"):
+    def __init__(
+        self,
+        db_path: Optional[Path] = None,
+        data_dir: Optional[Path] = None,
+        category: str = "default",
+    ):
         """
         Initialize the POI database.
 
@@ -96,7 +103,9 @@ class POIDatabase:
 
                 # Handle old list format (migrate to new dict format)
                 if isinstance(data, list):
-                    logger.warning("Migrating old POI database format to new dictionary structure")
+                    logger.warning(
+                        "Migrating old POI database format to new dictionary structure"
+                    )
                     migrated_data = {"default": data, "example": []}
                     with open(self.db_path, "w") as fw:
                         json.dump(migrated_data, fw, indent=2)
@@ -104,11 +113,17 @@ class POIDatabase:
 
                 # Load from specified category
                 if self.category not in data:
-                    logger.warning(f"Category '{self.category}' not found, creating empty category")
+                    logger.warning(
+                        f"Category '{self.category}' not found, creating empty category"
+                    )
                     data[self.category] = []
 
-                self.planes = [PlaneOfInterest.from_dict(p) for p in data[self.category]]
-                logger.info(f"Loaded {len(self.planes)} planes of interest from category '{self.category}'")
+                self.planes = [
+                    PlaneOfInterest.from_dict(p) for p in data[self.category]
+                ]
+                logger.info(
+                    f"Loaded {len(self.planes)} planes of interest from category '{self.category}'"
+                )
         except json.JSONDecodeError as e:
             logger.error(f"Error parsing POI database: {e}")
             self.planes = []
@@ -133,7 +148,9 @@ class POIDatabase:
             # Save everything back
             with open(self.db_path, "w") as f:
                 json.dump(all_data, f, indent=2)
-            logger.info(f"Saved {len(self.planes)} planes of interest to category '{self.category}'")
+            logger.info(
+                f"Saved {len(self.planes)} planes of interest to category '{self.category}'"
+            )
         except Exception as e:
             logger.error(f"Error saving POI database: {e}")
 
