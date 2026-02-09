@@ -1,6 +1,18 @@
 #!/usr/bin/env bash
 # Glycol launcher - runs the application in the background
 
+set -euo pipefail
+usage() {
+    exec python -m glycol --help
+}
+for arg in "$@"; do
+    case "$arg" in
+        -h|--help)
+            usage
+            ;;
+    esac
+done
+
 # Get the directory where this script is located
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
