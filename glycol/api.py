@@ -6,32 +6,32 @@ from glycol.auth import OpenSkyAuth
 STATES_URL = "https://opensky-network.org/api/states/all"
 
 # Field indices in the OpenSky state vector array
-_FIELDS = [
-    "icao24",          # 0
-    "callsign",        # 1
+_STATE_FIELDS = [
+    "icao24",  # 0
+    "callsign",  # 1
     "origin_country",  # 2
-    "time_position",   # 3
-    "last_contact",    # 4
-    "longitude",       # 5
-    "latitude",        # 6
-    "baro_altitude",   # 7
-    "on_ground",       # 8
-    "velocity",        # 9
-    "true_track",      # 10
-    "vertical_rate",   # 11
-    "sensors",         # 12
-    "geo_altitude",    # 13
-    "squawk",          # 14
-    "spi",             # 15
-    "position_source", # 16
-    "category",        # 17  (extended mode only)
+    "time_position",  # 3
+    "last_contact",  # 4
+    "longitude",  # 5
+    "latitude",  # 6
+    "baro_altitude",  # 7
+    "on_ground",  # 8
+    "velocity",  # 9
+    "true_track",  # 10
+    "vertical_rate",  # 11
+    "sensors",  # 12
+    "geo_altitude",  # 13
+    "squawk",  # 14
+    "spi",  # 15
+    "position_source",  # 16
+    "category",  # 17  (extended mode only)
 ]
 
 
 def _parse_state(raw: list) -> dict:
     """Convert an index-based state vector into a named dict."""
     d = {}
-    for i, name in enumerate(_FIELDS):
+    for i, name in enumerate(_STATE_FIELDS):
         d[name] = raw[i] if i < len(raw) else None
     # Normalize callsign whitespace
     if d.get("callsign"):
@@ -78,9 +78,7 @@ class OpenSkyClient:
         headers = self.auth.get_headers()
 
         try:
-            resp = requests.get(
-                STATES_URL, params=params, headers=headers, timeout=15
-            )
+            resp = requests.get(STATES_URL, params=params, headers=headers, timeout=15)
 
             # Track rate limits
             rl = resp.headers.get("X-Rate-Limit-Remaining")

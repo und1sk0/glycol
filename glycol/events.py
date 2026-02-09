@@ -46,9 +46,7 @@ class EventStore:
             "category": event.get("category"),
             "origin_country": event.get("origin_country"),
         }
-        self._df = pd.concat(
-            [self._df, pd.DataFrame([row])], ignore_index=True
-        )
+        self._df = pd.concat([self._df, pd.DataFrame([row])], ignore_index=True)
 
     def get_dataframe(self) -> pd.DataFrame:
         return self._df.copy()

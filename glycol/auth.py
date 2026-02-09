@@ -6,7 +6,6 @@ from typing import Optional, Tuple
 
 import requests
 
-
 logger = logging.getLogger(__name__)
 
 TOKEN_URL = (
@@ -70,8 +69,7 @@ class OpenSkyAuth:
 
 
 def load_credentials_from_file(
-    credentials_path: Optional[Path] = None,
-    data_dir: Optional[Path] = None
+    credentials_path: Optional[Path] = None, data_dir: Optional[Path] = None
 ) -> Optional[Tuple[str, str]]:
     """
     Load credentials from a JSON file.

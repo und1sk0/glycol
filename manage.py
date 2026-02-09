@@ -14,7 +14,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 
 from glycol.poi import POIDatabase, PlaneOfInterest
-from glycol.groups import GroupsDatabase, AircraftType
+from glycol.typegroups import TypeGroupsDatabase, AircraftType
 
 
 # =============================================================================
@@ -157,7 +157,7 @@ def poi_categories(db: POIDatabase):
 # Groups Management Functions
 # =============================================================================
 
-def groups_list(db: GroupsDatabase):
+def groups_list(db: TypeGroupsDatabase):
     """List all groups."""
     groups = db.list_groups()
     if not groups:
@@ -172,7 +172,7 @@ def groups_list(db: GroupsDatabase):
     print(f"\nTotal: {len(groups)} groups")
 
 
-def groups_view_interactive(db: GroupsDatabase):
+def groups_view_interactive(db: TypeGroupsDatabase):
     """View aircraft in a group."""
     print("\n=== View Group ===")
     groups = db.list_groups()
@@ -217,7 +217,7 @@ def groups_view_interactive(db: GroupsDatabase):
     print(f"\nTotal: {len(codes)} aircraft")
 
 
-def groups_create_interactive(db: GroupsDatabase):
+def groups_create_interactive(db: TypeGroupsDatabase):
     """Interactively create a group."""
     print("\n=== Create Group ===")
     name = input("Group name: ").strip()
@@ -231,7 +231,7 @@ def groups_create_interactive(db: GroupsDatabase):
         print(f"\n✗ Group already exists: {name}")
 
 
-def groups_add_aircraft_interactive(db: GroupsDatabase):
+def groups_add_aircraft_interactive(db: TypeGroupsDatabase):
     """Add aircraft to a group."""
     print("\n=== Add Aircraft to Group ===")
     groups = db.list_groups()
@@ -272,7 +272,7 @@ def groups_add_aircraft_interactive(db: GroupsDatabase):
         print(f"\n✗ Could not add {code} to {group_name}")
 
 
-def groups_remove_aircraft_interactive(db: GroupsDatabase):
+def groups_remove_aircraft_interactive(db: TypeGroupsDatabase):
     """Remove aircraft from a group."""
     print("\n=== Remove Aircraft from Group ===")
     groups = db.list_groups()
@@ -318,7 +318,7 @@ def groups_remove_aircraft_interactive(db: GroupsDatabase):
         print(f"\n✗ Could not remove {code} from {group_name}")
 
 
-def groups_delete_interactive(db: GroupsDatabase):
+def groups_delete_interactive(db: TypeGroupsDatabase):
     """Delete a group."""
     print("\n=== Delete Group ===")
     groups = db.list_groups()
@@ -358,7 +358,7 @@ def groups_delete_interactive(db: GroupsDatabase):
 # Glossary Management Functions
 # =============================================================================
 
-def glossary_list(db: GroupsDatabase):
+def glossary_list(db: TypeGroupsDatabase):
     """List all aircraft types in glossary."""
     types = db.list_all_types()
     if not types:
@@ -372,7 +372,7 @@ def glossary_list(db: GroupsDatabase):
     print(f"\nTotal: {len(types)} aircraft types")
 
 
-def glossary_get_interactive(db: GroupsDatabase):
+def glossary_get_interactive(db: TypeGroupsDatabase):
     """Get details for an aircraft type."""
     print("\n=== Get Aircraft Type ===")
     code = input("Aircraft type code: ").strip().upper()
@@ -388,7 +388,7 @@ def glossary_get_interactive(db: GroupsDatabase):
     print(f"Notes: {aircraft.notes}")
 
 
-def glossary_add_interactive(db: GroupsDatabase):
+def glossary_add_interactive(db: TypeGroupsDatabase):
     """Add an aircraft type to glossary."""
     print("\n=== Add Aircraft Type ===")
     code = input("Type code (required): ").strip().upper()
@@ -408,7 +408,7 @@ def glossary_add_interactive(db: GroupsDatabase):
         print(f"\n✗ Aircraft type already exists: {code}")
 
 
-def glossary_update_interactive(db: GroupsDatabase):
+def glossary_update_interactive(db: TypeGroupsDatabase):
     """Update an aircraft type."""
     print("\n=== Update Aircraft Type ===")
     code = input("Type code: ").strip().upper()
@@ -443,7 +443,7 @@ def glossary_update_interactive(db: GroupsDatabase):
         print("\nNo changes made")
 
 
-def glossary_remove_interactive(db: GroupsDatabase):
+def glossary_remove_interactive(db: TypeGroupsDatabase):
     """Remove an aircraft type from glossary."""
     print("\n=== Remove Aircraft Type ===")
     code = input("Type code: ").strip().upper()
@@ -461,7 +461,7 @@ def glossary_remove_interactive(db: GroupsDatabase):
         print("\nCancelled")
 
 
-def glossary_search_interactive(db: GroupsDatabase):
+def glossary_search_interactive(db: TypeGroupsDatabase):
     """Search for aircraft types."""
     print("\n=== Search Aircraft Types ===")
     query = input("Search query: ").strip()
@@ -485,7 +485,7 @@ def glossary_search_interactive(db: GroupsDatabase):
 def interactive_mode(data_dir=None):
     """Run in interactive menu mode."""
     poi_db = POIDatabase(data_dir=data_dir)
-    groups_db = GroupsDatabase(data_dir=data_dir)
+    groups_db = TypeGroupsDatabase(data_dir=data_dir)
 
     while True:
         print("\n" + "=" * 60)
@@ -556,7 +556,7 @@ def poi_menu(db: POIDatabase):
             print("\nInvalid choice")
 
 
-def groups_menu(db: GroupsDatabase):
+def groups_menu(db: TypeGroupsDatabase):
     """Groups management menu."""
     while True:
         print("\n" + "-" * 60)
@@ -590,7 +590,7 @@ def groups_menu(db: GroupsDatabase):
             print("\nInvalid choice")
 
 
-def glossary_menu(db: GroupsDatabase):
+def glossary_menu(db: TypeGroupsDatabase):
     """Glossary management menu."""
     while True:
         print("\n" + "-" * 60)
@@ -732,7 +732,7 @@ def cli_mode():
                 sys.exit(1)
 
     elif args.command == "groups":
-        db = GroupsDatabase(data_dir=args.data_dir)
+        db = TypeGroupsDatabase(data_dir=args.data_dir)
         if args.groups_command == "list":
             groups_list(db)
         elif args.groups_command == "view":
@@ -750,7 +750,7 @@ def cli_mode():
                 sys.exit(1)
 
     elif args.command == "glossary":
-        db = GroupsDatabase(data_dir=args.data_dir)
+        db = TypeGroupsDatabase(data_dir=args.data_dir)
         if args.glossary_command == "list":
             glossary_list(db)
         elif args.glossary_command == "get":
