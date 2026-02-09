@@ -192,6 +192,9 @@ class GlycolApp:
         ttk.Label(frame, text="Filter:").grid(
             row=0, column=2, sticky=tk.W, padx=(12, 0)
         )
+        # Map internal mode to display value
+        mode_display = {None: "All Traffic", "aircraft": "Aircraft", "type_group": "Type Group"}
+        self.mode_var = tk.StringVar(value=mode_display.get(mode, "All Traffic"))
         mode_combo = ttk.Combobox(
             frame,
             textvariable=self.mode_var,
@@ -199,10 +202,6 @@ class GlycolApp:
             state="readonly",
             width=12,
         )
-        # Map internal mode to display value
-        mode_display = {None: "All Traffic", "aircraft": "Aircraft", "type_group": "Type Group"}
-        self.mode_var = tk.StringVar(value=mode_display.get(mode, "All Traffic"))
-        mode_combo.config(textvariable=self.mode_var)
         mode_combo.grid(row=0, column=3, padx=4)
 
         # Filter Value
