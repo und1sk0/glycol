@@ -61,7 +61,7 @@ class GlycolApp:
         self.client: OpenSkyClient | None = None
         self.groups_db = GroupsDatabase(data_dir=data_dir)
         self.monitor = AircraftMonitor(filter_mode=None, icao_to_type=ICAO24_TO_TYPE)
-        self.store = EventStore()
+        self.store = EventStore(logs_dir=logs_dir)
         self._polling = False
         self._poll_thread: threading.Thread | None = None
         self._stop_event = threading.Event()
@@ -369,7 +369,7 @@ class GlycolApp:
 
         self.monitor.set_filter(filter_mode, filt_for_monitor)
         self.monitor.reset()
-        self.store = EventStore(airport=airport)
+        self.store = EventStore(airport=airport, logs_dir=self.logs_dir)
 
         self._polling = True
         self._stop_event.clear()

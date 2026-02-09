@@ -49,7 +49,7 @@ def setup_logging(log_file: str = None, logs_dir: str = None) -> str:
     """
     # Create logs directory if it doesn't exist
     if logs_dir is None:
-        logs_dir = Path(__file__).parent.parent / "logs"
+        logs_dir = Path.cwd() / "logs"
     else:
         logs_dir = Path(logs_dir)
 
