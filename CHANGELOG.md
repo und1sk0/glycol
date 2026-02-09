@@ -5,6 +5,11 @@ All notable changes to Glycol will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.1] - 2026-02-08
+
+### Fixed
+- `glycol.sh -h` does not launch into the background; it prints the help docstring and exits
+
 ## [1.0.0] - 2026-02-08
 
 ### Added
@@ -192,7 +197,7 @@ cat logs/glycol-*.log | jq 'select(.timestamp > "2026-02-08")'
 
 ## Release Information
 
-**Version:** 1.0.0
+**Version:** 1.0.1
 **Release Date:** February 8, 2026
 **Status:** Stable
 **License:** MIT (if applicable)
