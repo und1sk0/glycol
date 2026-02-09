@@ -5,7 +5,7 @@ Track aircraft around configured airports, detect takeoff and landing events,
 and manage planes of interest with the OpenSky Network API.
 """
 
-__version__ = "1.0.0"
+__version__ = "1.2.2"
 __author__ = "Glycol Project"
 __license__ = "MIT"
 

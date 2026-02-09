@@ -24,8 +24,9 @@ _COLUMNS = [
 class EventStore:
     """Accumulates takeoff/landing events in a pandas DataFrame."""
 
-    def __init__(self, airport: str = ""):
+    def __init__(self, airport: str = "", logs_dir: str | None = None):
         self.airport = airport.upper()
+        self.logs_dir = logs_dir
         self._df = pd.DataFrame(columns=_COLUMNS)
 
     def record_event(self, event: dict):
@@ -56,7 +57,10 @@ class EventStore:
         if path is None:
             date_str = datetime.date.today().isoformat()
             filename = f"glycol_events_{self.airport}_{date_str}.csv"
-            path = os.path.join(os.getcwd(), filename)
+            if self.logs_dir:
+                path = os.path.join(self.logs_dir, filename)
+            else:
+                path = os.path.join(os.getcwd(), "logs", filename)
         self._df.to_csv(path, index=False)
         return path
 
