@@ -467,7 +467,11 @@ class GlycolApp:
         alt = _fmt(ev.get("altitude_m"))
         spd = _fmt(ev.get("velocity_ms"))
         ts = ev.get("timestamp", "")[:19]
-        self._log(f"[{tag}] {ts}  {cs} ({icao})  alt={alt}m  spd={spd}m/s")
+
+        # Look up type code
+        type_code = ICAO24_TO_TYPE.get(icao.lower(), "?")
+
+        self._log(f"[{tag}] {ts}  {cs} ({icao})  {type_code}  alt={alt}m  spd={spd}m/s")
 
     def _log(self, text: str):
         self.log_text.config(state=tk.NORMAL)
