@@ -93,18 +93,22 @@ def main():
         default="",
         help="ICAO airport code to monitor (e.g. KSFO)",
     )
-    parser.add_argument(
-        "--mode",
-        choices=["A", "B", "C"],
-        default="C",
-        help="Filter mode: A=ICAO24/tail, B=category, C=all traffic",
-    )
-    parser.add_argument(
-        "--filter",
-        dest="filter_text",
+
+    # Mutually exclusive filter options
+    filter_group = parser.add_mutually_exclusive_group()
+    filter_group.add_argument(
+        "--aircraft",
+        dest="aircraft_filter",
         default="",
-        help="Comma-separated filter values (for modes A and B)",
+        help="Filter by ICAO24 address or tail number (comma-separated)",
     )
+    filter_group.add_argument(
+        "--group",
+        dest="group_filter",
+        default="",
+        help="Filter by aircraft group name",
+    )
+
     parser.add_argument(
         "--log",
         dest="log_file",
@@ -125,10 +129,26 @@ def main():
     )
     args = parser.parse_args()
 
+    # Determine mode and filter from new flags
+    if args.aircraft_filter:
+        mode = "A"
+        filter_text = args.aircraft_filter
+    elif args.group_filter:
+        mode = "B"
+        filter_text = args.group_filter
+    else:
+        mode = "C"
+        filter_text = ""
+
     # Set up logging
     log_path = setup_logging(args.log_file, args.logs_dir)
     logging.info(f"Glycol starting - logging to {log_path}")
-    logging.info(f"Airport: {args.airport or 'Not set'}, Mode: {args.mode}, Filter: {args.filter_text or 'None'}")
+    if args.aircraft_filter:
+        logging.info(f"Airport: {args.airport or 'Not set'}, Filter: aircraft={args.aircraft_filter}")
+    elif args.group_filter:
+        logging.info(f"Airport: {args.airport or 'Not set'}, Filter: group={args.group_filter}")
+    else:
+        logging.info(f"Airport: {args.airport or 'Not set'}, Filter: all traffic")
     if args.data_dir:
         logging.info(f"Data directory: {args.data_dir}")
     if args.logs_dir:
@@ -136,8 +156,8 @@ def main():
 
     run_app(
         airport=args.airport,
-        mode=args.mode,
-        filter_text=args.filter_text,
+        mode=mode,
+        filter_text=filter_text,
         data_dir=args.data_dir,
         logs_dir=args.logs_dir
     )
