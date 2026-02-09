@@ -1,0 +1,573 @@
+{
+  "groups": {
+    "passenger": [
+      "A388",
+      "A359",
+      "A35K",
+      "B77W",
+      "B77L",
+      "B789",
+      "B78X",
+      "A321",
+      "A21N",
+      "B738",
+      "B38M",
+      "B39M",
+      "A320",
+      "A20N",
+      "B752",
+      "B763",
+      "B772",
+      "A333",
+      "A339",
+      "B744",
+      "MD11",
+      "DC10",
+      "CRJ9",
+      "E75L",
+      "E75S",
+      "DH8D"
+    ],
+    "cargo": [
+      "B74F",
+      "B77L",
+      "MD11F",
+      "B763F",
+      "B788F",
+      "A306F",
+      "B461F",
+      "DC10F",
+      "C130",
+      "C17"
+    ],
+    "military_fighter": [
+      "F16",
+      "F15",
+      "F18",
+      "F22",
+      "F35",
+      "A10",
+      "F4",
+      "F14",
+      "E2",
+      "MIR2"
+    ],
+    "military_transport": [
+      "C130",
+      "C17",
+      "C5",
+      "KC135",
+      "KC10",
+      "KC46",
+      "C40",
+      "C37",
+      "C21",
+      "UC35"
+    ],
+    "coast_guard": [
+      "C130",
+      "HC130",
+      "H60",
+      "H65",
+      "C27J"
+    ],
+    "business_jet": [
+      "GLF5",
+      "GLF6",
+      "G650",
+      "GLEX",
+      "FA7X",
+      "FA50",
+      "CL60",
+      "E55P",
+      "PC12",
+      "TBM9",
+      "C25C",
+      "C56X",
+      "C68A"
+    ],
+    "general_aviation": [
+      "C172",
+      "C182",
+      "C206",
+      "PA28",
+      "PA32",
+      "PA46",
+      "SR22",
+      "BE36",
+      "BE58",
+      "P28A"
+    ],
+    "helicopter": [
+      "R44",
+      "R66",
+      "B407",
+      "B429",
+      "AS50",
+      "AS55",
+      "EC35",
+      "EC45",
+      "S76",
+      "AW09",
+      "H60",
+      "CH47"
+    ]
+  },
+  "glossary": {
+    "A388": {
+      "make": "Airbus",
+      "model": "A380-800",
+      "notes": "Double-deck wide-body, world's largest passenger airliner"
+    },
+    "A359": {
+      "make": "Airbus",
+      "model": "A350-900",
+      "notes": "Long-range wide-body twin-engine"
+    },
+    "A35K": {
+      "make": "Airbus",
+      "model": "A350-1000",
+      "notes": "Stretched variant of A350-900"
+    },
+    "B77W": {
+      "make": "Boeing",
+      "model": "777-300ER",
+      "notes": "Long-range wide-body twin-engine, extended range"
+    },
+    "B77L": {
+      "make": "Boeing",
+      "model": "777F",
+      "notes": "Freighter variant of 777-200LR"
+    },
+    "B789": {
+      "make": "Boeing",
+      "model": "787-9 Dreamliner",
+      "notes": "Mid-size wide-body, composite construction"
+    },
+    "B78X": {
+      "make": "Boeing",
+      "model": "787-10 Dreamliner",
+      "notes": "Stretched variant of 787-9"
+    },
+    "A321": {
+      "make": "Airbus",
+      "model": "A321",
+      "notes": "Stretched variant of A320 family"
+    },
+    "A21N": {
+      "make": "Airbus",
+      "model": "A321neo",
+      "notes": "New engine option variant with improved efficiency"
+    },
+    "B738": {
+      "make": "Boeing",
+      "model": "737-800",
+      "notes": "Most popular 737 Next Generation variant"
+    },
+    "B38M": {
+      "make": "Boeing",
+      "model": "737 MAX 8",
+      "notes": "Fourth generation 737 with CFM LEAP engines"
+    },
+    "B39M": {
+      "make": "Boeing",
+      "model": "737 MAX 9",
+      "notes": "Stretched variant of 737 MAX 8"
+    },
+    "A320": {
+      "make": "Airbus",
+      "model": "A320",
+      "notes": "Narrow-body twin-engine, first digital fly-by-wire airliner"
+    },
+    "A20N": {
+      "make": "Airbus",
+      "model": "A320neo",
+      "notes": "New engine option with 15% fuel savings"
+    },
+    "B752": {
+      "make": "Boeing",
+      "model": "757-200",
+      "notes": "Narrow-body twin-engine, production ended 2004"
+    },
+    "B763": {
+      "make": "Boeing",
+      "model": "767-300",
+      "notes": "Wide-body twin-engine, stretched variant"
+    },
+    "B772": {
+      "make": "Boeing",
+      "model": "777-200",
+      "notes": "Wide-body twin-engine, original 777 variant"
+    },
+    "A333": {
+      "make": "Airbus",
+      "model": "A330-300",
+      "notes": "Wide-body twin-engine, stretched variant"
+    },
+    "A339": {
+      "make": "Airbus",
+      "model": "A330-900neo",
+      "notes": "Re-engined A330 with improved efficiency"
+    },
+    "B744": {
+      "make": "Boeing",
+      "model": "747-400",
+      "notes": "Queen of the Skies, iconic hump-backed quad-jet"
+    },
+    "B74F": {
+      "make": "Boeing",
+      "model": "747-8F",
+      "notes": "Latest 747 freighter variant, stretched fuselage"
+    },
+    "MD11": {
+      "make": "McDonnell Douglas",
+      "model": "MD-11",
+      "notes": "Tri-jet wide-body derived from DC-10"
+    },
+    "MD11F": {
+      "make": "McDonnell Douglas",
+      "model": "MD-11F",
+      "notes": "Freighter variant, popular with cargo carriers"
+    },
+    "DC10": {
+      "make": "McDonnell Douglas",
+      "model": "DC-10",
+      "notes": "Tri-jet wide-body, production ended 1989"
+    },
+    "DC10F": {
+      "make": "McDonnell Douglas",
+      "model": "DC-10F",
+      "notes": "Freighter variant of DC-10"
+    },
+    "B763F": {
+      "make": "Boeing",
+      "model": "767-300F",
+      "notes": "Freighter variant, popular with express carriers"
+    },
+    "B788F": {
+      "make": "Boeing",
+      "model": "787-8F",
+      "notes": "Proposed freighter variant (not yet in service)"
+    },
+    "A306F": {
+      "make": "Airbus",
+      "model": "A300-600F",
+      "notes": "Freighter variant, workhorse for cargo operations"
+    },
+    "B461F": {
+      "make": "BAe",
+      "model": "BAe 146-100F",
+      "notes": "Quad-jet freighter, quiet operation"
+    },
+    "CRJ9": {
+      "make": "Bombardier",
+      "model": "CRJ-900",
+      "notes": "Regional jet, 76-90 seats"
+    },
+    "E75L": {
+      "make": "Embraer",
+      "model": "E175 (long wing)",
+      "notes": "Regional jet, 76-88 seats"
+    },
+    "E75S": {
+      "make": "Embraer",
+      "model": "E175 (short wing)",
+      "notes": "Regional jet variant"
+    },
+    "DH8D": {
+      "make": "Bombardier",
+      "model": "Q400 (Dash 8)",
+      "notes": "Turboprop regional airliner, 68-90 seats"
+    },
+    "C130": {
+      "make": "Lockheed",
+      "model": "C-130 Hercules",
+      "notes": "Military transport, four-engine turboprop"
+    },
+    "HC130": {
+      "make": "Lockheed",
+      "model": "HC-130 Hercules",
+      "notes": "Coast Guard search and rescue variant"
+    },
+    "C17": {
+      "make": "Boeing",
+      "model": "C-17 Globemaster III",
+      "notes": "Strategic airlifter, high-wing quad-jet"
+    },
+    "C5": {
+      "make": "Lockheed",
+      "model": "C-5 Galaxy",
+      "notes": "Strategic airlifter, one of largest military aircraft"
+    },
+    "KC135": {
+      "make": "Boeing",
+      "model": "KC-135 Stratotanker",
+      "notes": "Aerial refueling tanker based on 707"
+    },
+    "KC10": {
+      "make": "McDonnell Douglas",
+      "model": "KC-10 Extender",
+      "notes": "Aerial refueling tanker based on DC-10"
+    },
+    "KC46": {
+      "make": "Boeing",
+      "model": "KC-46 Pegasus",
+      "notes": "Next-generation aerial refueling tanker based on 767"
+    },
+    "C40": {
+      "make": "Boeing",
+      "model": "C-40 Clipper",
+      "notes": "Military VIP transport based on 737"
+    },
+    "C37": {
+      "make": "Gulfstream",
+      "model": "C-37 (G550)",
+      "notes": "Military VIP transport"
+    },
+    "C21": {
+      "make": "Learjet",
+      "model": "C-21",
+      "notes": "Military transport based on Learjet 35"
+    },
+    "UC35": {
+      "make": "Cessna",
+      "model": "UC-35 Citation",
+      "notes": "Military utility transport"
+    },
+    "F16": {
+      "make": "General Dynamics",
+      "model": "F-16 Fighting Falcon",
+      "notes": "Multirole fighter, single-engine"
+    },
+    "F15": {
+      "make": "McDonnell Douglas",
+      "model": "F-15 Eagle",
+      "notes": "Air superiority fighter, twin-engine"
+    },
+    "F18": {
+      "make": "McDonnell Douglas",
+      "model": "F/A-18 Hornet",
+      "notes": "Carrier-based multirole fighter"
+    },
+    "F22": {
+      "make": "Lockheed Martin",
+      "model": "F-22 Raptor",
+      "notes": "Stealth air superiority fighter, fifth generation"
+    },
+    "F35": {
+      "make": "Lockheed Martin",
+      "model": "F-35 Lightning II",
+      "notes": "Stealth multirole fighter, multiple variants"
+    },
+    "A10": {
+      "make": "Fairchild Republic",
+      "model": "A-10 Thunderbolt II",
+      "notes": "Close air support, twin-engine, heavily armored"
+    },
+    "F4": {
+      "make": "McDonnell Douglas",
+      "model": "F-4 Phantom II",
+      "notes": "Tandem two-seat fighter-bomber, retired from US service"
+    },
+    "F14": {
+      "make": "Grumman",
+      "model": "F-14 Tomcat",
+      "notes": "Carrier-based interceptor, variable-sweep wing"
+    },
+    "E2": {
+      "make": "Grumman",
+      "model": "E-2 Hawkeye",
+      "notes": "Carrier-based airborne early warning"
+    },
+    "MIR2": {
+      "make": "Dassault",
+      "model": "Mirage 2000",
+      "notes": "French multirole fighter"
+    },
+    "C27J": {
+      "make": "Alenia",
+      "model": "C-27J Spartan",
+      "notes": "Tactical airlifter, twin turboprop"
+    },
+    "H60": {
+      "make": "Sikorsky",
+      "model": "UH-60 Black Hawk",
+      "notes": "Utility helicopter, twin turboshaft"
+    },
+    "H65": {
+      "make": "Eurocopter",
+      "model": "HH-65 Dolphin",
+      "notes": "Coast Guard search and rescue helicopter"
+    },
+    "GLF5": {
+      "make": "Gulfstream",
+      "model": "G550",
+      "notes": "Long-range business jet"
+    },
+    "GLF6": {
+      "make": "Gulfstream",
+      "model": "G650",
+      "notes": "Ultra-long-range business jet, flagship model"
+    },
+    "G650": {
+      "make": "Gulfstream",
+      "model": "G650ER",
+      "notes": "Extended range variant"
+    },
+    "GLEX": {
+      "make": "Bombardier",
+      "model": "Global Express",
+      "notes": "Ultra-long-range business jet"
+    },
+    "FA7X": {
+      "make": "Dassault",
+      "model": "Falcon 7X",
+      "notes": "Long-range tri-jet business jet"
+    },
+    "FA50": {
+      "make": "Dassault",
+      "model": "Falcon 50",
+      "notes": "Mid-size tri-jet business jet"
+    },
+    "CL60": {
+      "make": "Bombardier",
+      "model": "Challenger 600",
+      "notes": "Large-cabin business jet family"
+    },
+    "E55P": {
+      "make": "Embraer",
+      "model": "Phenom 300",
+      "notes": "Light business jet"
+    },
+    "PC12": {
+      "make": "Pilatus",
+      "model": "PC-12",
+      "notes": "Single-engine turboprop utility aircraft"
+    },
+    "TBM9": {
+      "make": "Daher",
+      "model": "TBM 900",
+      "notes": "High-performance single-engine turboprop"
+    },
+    "C25C": {
+      "make": "Cessna",
+      "model": "Citation CJ4",
+      "notes": "Light business jet"
+    },
+    "C56X": {
+      "make": "Cessna",
+      "model": "Citation Excel",
+      "notes": "Mid-size business jet"
+    },
+    "C68A": {
+      "make": "Cessna",
+      "model": "Citation Latitude",
+      "notes": "Mid-size business jet"
+    },
+    "C172": {
+      "make": "Cessna",
+      "model": "172 Skyhawk",
+      "notes": "Most produced aircraft in history, four-seat trainer"
+    },
+    "C182": {
+      "make": "Cessna",
+      "model": "182 Skylane",
+      "notes": "Four-seat single-engine, high-wing"
+    },
+    "C206": {
+      "make": "Cessna",
+      "model": "206 Stationair",
+      "notes": "Six-seat utility aircraft"
+    },
+    "PA28": {
+      "make": "Piper",
+      "model": "Cherokee/Warrior/Archer",
+      "notes": "Four-seat single-engine, low-wing trainer"
+    },
+    "PA32": {
+      "make": "Piper",
+      "model": "Cherokee Six/Saratoga",
+      "notes": "Six/seven-seat single-engine"
+    },
+    "PA46": {
+      "make": "Piper",
+      "model": "Malibu/Mirage/Matrix",
+      "notes": "Six-seat pressurized single-engine"
+    },
+    "SR22": {
+      "make": "Cirrus",
+      "model": "SR22",
+      "notes": "Four-seat single-engine with ballistic parachute"
+    },
+    "BE36": {
+      "make": "Beechcraft",
+      "model": "Bonanza A36",
+      "notes": "Six-seat single-engine, V-tail or conventional tail"
+    },
+    "BE58": {
+      "make": "Beechcraft",
+      "model": "Baron 58",
+      "notes": "Six-seat twin-engine"
+    },
+    "P28A": {
+      "make": "Piper",
+      "model": "PA-28 (generic)",
+      "notes": "ICAO generic code for PA-28 family"
+    },
+    "R44": {
+      "make": "Robinson",
+      "model": "R44",
+      "notes": "Four-seat light helicopter, piston engine"
+    },
+    "R66": {
+      "make": "Robinson",
+      "model": "R66",
+      "notes": "Five-seat light helicopter, turbine engine"
+    },
+    "B407": {
+      "make": "Bell",
+      "model": "407",
+      "notes": "Seven-seat light utility helicopter"
+    },
+    "B429": {
+      "make": "Bell",
+      "model": "429",
+      "notes": "Light twin-engine helicopter"
+    },
+    "AS50": {
+      "make": "Airbus",
+      "model": "H125 (AS350)",
+      "notes": "Single-engine utility helicopter, Écureuil/AStar"
+    },
+    "AS55": {
+      "make": "Airbus",
+      "model": "H125 (AS355)",
+      "notes": "Twin-engine variant of AS350"
+    },
+    "EC35": {
+      "make": "Airbus",
+      "model": "H135 (EC135)",
+      "notes": "Light twin-engine utility helicopter"
+    },
+    "EC45": {
+      "make": "Airbus",
+      "model": "H145 (EC145)",
+      "notes": "Twin-engine utility helicopter"
+    },
+    "S76": {
+      "make": "Sikorsky",
+      "model": "S-76",
+      "notes": "Medium twin-engine helicopter, offshore/VIP"
+    },
+    "AW09": {
+      "make": "Leonardo",
+      "model": "AW109",
+      "notes": "Light twin-engine helicopter"
+    },
+    "CH47": {
+      "make": "Boeing",
+      "model": "CH-47 Chinook",
+      "notes": "Heavy-lift tandem rotor helicopter"
+    }
+  }
+}

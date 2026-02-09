@@ -1,0 +1,21 @@
+"""
+Glycol - Real-time airport flight monitor.
+
+Track aircraft around configured airports, detect takeoff and landing events,
+and manage planes of interest with the OpenSky Network API.
+"""
+
+__version__ = "1.0.0"
+__author__ = "Glycol Project"
+__license__ = "MIT"
+
+from glycol.poi import POIDatabase, PlaneOfInterest
+from glycol.groups import GroupsDatabase, AircraftType
+
+__all__ = [
+    "POIDatabase",
+    "PlaneOfInterest",
+    "GroupsDatabase",
+    "AircraftType",
+    "__version__",
+]

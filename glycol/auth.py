@@ -1,6 +1,13 @@
+import json
+import logging
 import time
+from pathlib import Path
+from typing import Optional, Tuple
+
 import requests
 
+
+logger = logging.getLogger(__name__)
 
 TOKEN_URL = (
     "https://auth.opensky-network.org/auth/realms/opensky-network"
@@ -60,3 +67,56 @@ class OpenSkyAuth:
         if self._token:
             return {"Authorization": f"Bearer {self._token}"}
         return {}
+
+
+def load_credentials_from_file(
+    credentials_path: Optional[Path] = None,
+    data_dir: Optional[Path] = None
+) -> Optional[Tuple[str, str]]:
+    """
+    Load credentials from a JSON file.
+
+    Args:
+        credentials_path: Path to credentials file. If None, uses default location.
+        data_dir: Directory containing data files. If provided, credentials_path is relative to this.
+
+    Returns:
+        Tuple of (client_id, client_secret) if successful, None otherwise.
+    """
+    if credentials_path is None:
+        if data_dir is None:
+            # Default to glycol/data/credentials.json
+            data_dir = Path(__file__).parent / "data"
+        credentials_path = Path(data_dir) / "credentials.json"
+    else:
+        credentials_path = Path(credentials_path)
+
+    if not credentials_path.exists():
+        logger.info(f"Credentials file not found: {credentials_path}")
+        return None
+
+    try:
+        with open(credentials_path, "r") as f:
+            data = json.load(f)
+
+        # Validate structure
+        client_id = data.get("clientId")
+        client_secret = data.get("clientSecret")
+
+        if not client_id or not client_secret:
+            logger.warning(f"Invalid credentials file structure: {credentials_path}")
+            return None
+
+        if not isinstance(client_id, str) or not isinstance(client_secret, str):
+            logger.warning(f"Invalid credential types in: {credentials_path}")
+            return None
+
+        logger.info(f"Loaded credentials from: {credentials_path}")
+        return (client_id, client_secret)
+
+    except json.JSONDecodeError as e:
+        logger.error(f"Failed to parse credentials file: {e}")
+        return None
+    except Exception as e:
+        logger.error(f"Error loading credentials: {e}")
+        return None

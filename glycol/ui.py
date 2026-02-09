@@ -3,7 +3,7 @@ import tkinter as tk
 from tkinter import ttk, messagebox, filedialog, simpledialog
 import datetime
 
-from glycol.auth import OpenSkyAuth
+from glycol.auth import OpenSkyAuth, load_credentials_from_file
 from glycol.api import OpenSkyClient
 from glycol.airports import get_bounding_box, airport_name, AIRPORTS
 from glycol.monitor import AircraftMonitor
@@ -39,11 +39,17 @@ class GlycolApp:
         airport: str = "",
         mode: str = "C",
         filter_text: str = "",
+        data_dir: str = None,
+        logs_dir: str = None,
     ):
         self.root = root
         self.root.title("Glycol - OpenSky Airport Monitor")
         self.root.geometry("960x700")
         self.root.minsize(800, 550)
+
+        # Configuration
+        self.data_dir = data_dir
+        self.logs_dir = logs_dir
 
         # State
         self.auth: OpenSkyAuth | None = None
@@ -60,8 +66,8 @@ class GlycolApp:
         self._build_event_log()
         self._build_status_bar()
 
-        # Prompt for credentials on startup
-        self.root.after(200, self._prompt_credentials)
+        # Try to load credentials automatically, prompt if not found
+        self.root.after(200, self._auto_authenticate)
 
     # ---- UI construction ----
 
@@ -175,6 +181,18 @@ class GlycolApp:
         bar.pack(fill=tk.X, padx=6, pady=(0, 6))
 
     # ---- Credentials ----
+
+    def _auto_authenticate(self):
+        """Try to load credentials from file, prompt if not found."""
+        credentials = load_credentials_from_file(data_dir=self.data_dir)
+        if credentials:
+            client_id, client_secret = credentials
+            self.auth = OpenSkyAuth(client_id, client_secret)
+            self._set_status("Authenticating with saved credentials...")
+            threading.Thread(target=self._do_auth, daemon=True).start()
+        else:
+            # No credentials file found, prompt user
+            self._prompt_credentials()
 
     def _prompt_credentials(self):
         dlg = CredentialsDialog(self.root)
@@ -356,8 +374,21 @@ def _fmt(val) -> str:
     return str(val)
 
 
-def run_app(airport: str = "", mode: str = "C", filter_text: str = ""):
+def run_app(
+    airport: str = "",
+    mode: str = "C",
+    filter_text: str = "",
+    data_dir: str = None,
+    logs_dir: str = None,
+):
     root = tk.Tk()
-    app = GlycolApp(root, airport=airport, mode=mode, filter_text=filter_text)
+    app = GlycolApp(
+        root,
+        airport=airport,
+        mode=mode,
+        filter_text=filter_text,
+        data_dir=data_dir,
+        logs_dir=logs_dir,
+    )
     root.protocol("WM_DELETE_WINDOW", app._on_close)
     root.mainloop()
