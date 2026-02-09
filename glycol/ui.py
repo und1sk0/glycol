@@ -31,17 +31,9 @@ class CredentialsDialog(simpledialog.Dialog):
 class GlycolApp:
     """Main Tkinter application for Glycol airport monitoring."""
 
-    POLL_DEFAULT = 10  # seconds
-
-    def __init__(
-        self,
-        root: tk.Tk,
-        airport: str = "",
-        mode: str = "C",
-        filter_text: str = "",
-        data_dir: str = None,
-        logs_dir: str = None,
-    ):
+    def __init__(self, root: tk.Tk, airport: str = "", mode: str = "C", filter_text: str = "", data_dir: str = None,
+                 logs_dir: str = None, poll_interval=30):
+        self.poll_interval = poll_interval
         self.root = root
         self.root.title("Glycol - OpenSky Airport Monitor")
         self.root.geometry("960x700")
@@ -120,7 +112,7 @@ class GlycolApp:
         ttk.Label(frame, text="Poll (s):").grid(
             row=0, column=6, sticky=tk.W, padx=(12, 0)
         )
-        self.poll_var = tk.IntVar(value=self.POLL_DEFAULT)
+        self.poll_var = tk.IntVar(value=self.poll_interval)
         ttk.Spinbox(frame, from_=5, to=120, textvariable=self.poll_var, width=5).grid(
             row=0, column=7, padx=4
         )
@@ -390,19 +382,21 @@ def _fmt(val) -> str:
 
 def run_app(
     airport: str = "",
-    mode: str = "C",
-    filter_text: str = "",
     data_dir: str = None,
+    filter_text: str = "",
     logs_dir: str = None,
+    mode: str = "C",
+    poll_interval: int = 30,
 ):
     root = tk.Tk()
     app = GlycolApp(
         root,
         airport=airport,
-        mode=mode,
-        filter_text=filter_text,
         data_dir=data_dir,
+        filter_text=filter_text,
         logs_dir=logs_dir,
+        mode=mode,
+        poll_interval=poll_interval,
     )
     root.protocol("WM_DELETE_WINDOW", app._on_close)
     root.mainloop()

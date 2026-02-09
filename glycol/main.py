@@ -110,6 +110,13 @@ def main():
     )
 
     parser.add_argument(
+        "--interval",
+        dest="poll_interval",
+        default=30,
+        help="Polling interval seconds (default: 30)",
+    )
+
+    parser.add_argument(
         "--log",
         dest="log_file",
         default=None,
@@ -156,10 +163,11 @@ def main():
 
     run_app(
         airport=args.airport,
-        mode=mode,
-        filter_text=filter_text,
         data_dir=args.data_dir,
-        logs_dir=args.logs_dir
+        filter_text=filter_text,
+        logs_dir=args.logs_dir,
+        mode=mode,
+        poll_interval=args.poll_interval,
     )
 
 
