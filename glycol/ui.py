@@ -2,6 +2,7 @@ import datetime
 import re
 import threading
 import tkinter as tk
+import webbrowser
 from tkinter import ttk, messagebox, filedialog, simpledialog
 
 from glycol.auth import OpenSkyAuth, load_credentials_from_file
@@ -272,6 +273,9 @@ class GlycolApp:
         self.tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         vsb.pack(side=tk.RIGHT, fill=tk.Y)
 
+        # Bind double-click to open ICAO24 link
+        self.tree.bind("<Double-Button-1>", self._on_table_double_click)
+
     def _build_event_log(self):
         frame = ttk.LabelFrame(self.root, text="Event Log", padding=4)
         frame.pack(fill=tk.BOTH, expand=True, padx=6, pady=3)
@@ -282,12 +286,64 @@ class GlycolApp:
         self.log_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         sb.pack(side=tk.RIGHT, fill=tk.Y)
 
+        # Configure tag for clickable ICAO24 links
+        self.log_text.tag_config("icao24_link", foreground="blue", underline=True)
+        self.log_text.tag_bind("icao24_link", "<Button-1>", self._on_log_icao_click)
+        self.log_text.tag_bind("icao24_link", "<Enter>", lambda e: self.log_text.config(cursor="hand2"))
+        self.log_text.tag_bind("icao24_link", "<Leave>", lambda e: self.log_text.config(cursor=""))
+
     def _build_status_bar(self):
         self.status_var = tk.StringVar(value="Not authenticated")
         bar = ttk.Label(
             self.root, textvariable=self.status_var, relief=tk.SUNKEN, anchor=tk.W
         )
         bar.pack(fill=tk.X, padx=6, pady=(0, 6))
+
+    # ---- ICAO24 Link Handlers ----
+
+    def _open_icao24_link(self, icao24: str):
+        """Prompt user to choose which site to open for the ICAO24."""
+        icao24_lower = icao24.lower()
+
+        # Create a simple dialog for the user to choose
+        choice = messagebox.askquestion(
+            "Open ICAO24 Link",
+            f"Open {icao24} in:\n\nYes = OpenSky Network\nNo = ADSB-Exchange",
+            icon='question'
+        )
+
+        if choice == 'yes':
+            url = f"https://opensky-network.org/aircraft-profile?icao24={icao24_lower}"
+        else:
+            url = f"https://globe.adsbexchange.com/?icao={icao24_lower}"
+
+        webbrowser.open(url)
+
+    def _on_table_double_click(self, event):
+        """Handle double-click on aircraft table to open ICAO24 link."""
+        item = self.tree.selection()
+        if item:
+            values = self.tree.item(item[0], "values")
+            if values:
+                icao24 = values[0]  # ICAO24 is the first column
+                if icao24 and _ICAO24_RE.match(icao24):
+                    self._open_icao24_link(icao24)
+
+    def _on_log_icao_click(self, event):
+        """Handle click on ICAO24 link in event log."""
+        # Get the index of the click
+        index = self.log_text.index(f"@{event.x},{event.y}")
+
+        # Get all tags at this position
+        tags = self.log_text.tag_names(index)
+
+        # Find the ICAO24 tag (format: icao24_XXXXXX)
+        for tag in tags:
+            if tag.startswith("icao24_") and tag != "icao24_link":
+                icao24 = tag.split("_", 1)[1]
+                if _ICAO24_RE.match(icao24):
+                    self._open_icao24_link(icao24)
+                    break
 
     # ---- Credentials ----
 
@@ -471,7 +527,27 @@ class GlycolApp:
         # Look up type code
         type_code = ICAO24_TO_TYPE.get(icao.lower(), "?")
 
-        self._log(f"[{tag}] {ts}  {cs} ({icao})  {type_code}  alt={alt}m  spd={spd}m/s")
+        # Build message with clickable ICAO24
+        prefix = f"[{tag}] {ts}  {cs} ("
+        suffix = f")  {type_code}  alt={alt}m  spd={spd}m/s"
+
+        self.log_text.config(state=tk.NORMAL)
+        self.log_text.insert(tk.END, prefix)
+
+        # Insert ICAO24 with clickable tags if valid
+        if _ICAO24_RE.match(icao):
+            start_idx = self.log_text.index(tk.END + "-1c")
+            self.log_text.insert(tk.END, icao)
+            end_idx = self.log_text.index(tk.END + "-1c")
+            # Apply both the general link style and a unique tag with the ICAO24
+            self.log_text.tag_add("icao24_link", start_idx, end_idx)
+            self.log_text.tag_add(f"icao24_{icao}", start_idx, end_idx)
+        else:
+            self.log_text.insert(tk.END, icao)
+
+        self.log_text.insert(tk.END, suffix + "\n")
+        self.log_text.see(tk.END)
+        self.log_text.config(state=tk.DISABLED)
 
     def _log(self, text: str):
         self.log_text.config(state=tk.NORMAL)
