@@ -117,7 +117,7 @@ cat logs/glycol-*.log | jq -r '.message'
 All databases are stored in `glycol/data/`:
 - `us_airports.json` - 2000+ US airports
 - `planes_of_interest.json` - POI database
-- `groups.json` - Aircraft groups and glossary
+- `type_groups.json` - Aircraft groups and glossary
 - `credentials.json` - Your OAuth2 credentials (create this)
 
 ## 🎯 Use Cases

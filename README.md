@@ -197,7 +197,7 @@ python manage.py glossary search "737"       # Search by keyword
 - **A388** - Airbus A380-800 (Double-deck wide-body)
 - **F22** - Lockheed Martin F-22 Raptor (Stealth air superiority fighter)
 
-Database: `glycol/data/groups.json`
+Database: `glycol/data/type_groups.json`
 
 ## Supported Airports
 
@@ -220,7 +220,7 @@ glycol/
   data/
     us_airports.json          # Airport database (2000+ US airports)
     planes_of_interest.json   # POI database
-    groups.json               # Aircraft type groups and glossary
+    type_groups.json          # Aircraft type groups and glossary
 
 glycol.sh     # Background launcher script
 manage.py     # Interactive database manager (POI, type groups, glossary)
