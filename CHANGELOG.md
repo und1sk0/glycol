@@ -5,6 +5,21 @@ All notable changes to Glycol will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2026-02-09
+
+### Added
+- **Clickable ICAO24 Links** - ICAO24 identifiers in both the aircraft table and event log are now clickable
+  - Double-click aircraft table rows to open in ADSB-Exchange
+  - Single-click blue underlined ICAO24 links in event log
+  - Right-click context menu with options for both OpenSky Network and ADSB-Exchange
+  - Hover cursor feedback (hand pointer) on ICAO24 column
+  - Status bar hints when hovering over clickable ICAO24s
+- **Direct ADSB-Exchange Integration** - Quick access to live aircraft tracking on ADSB-Exchange globe view
+
+### Changed
+- **Simplified Link Behavior** - Default click action opens ADSB-Exchange directly without dialog prompt
+- **Improved Visual Feedback** - ICAO24 numbers styled as blue underlined links in event log with hover effects
+
 ## [1.2.2] - 2026-02-08
 
 ### Fixed
@@ -179,8 +194,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Release Information
 
-**Version:** 1.2.2
-**Release Date:** February 8, 2026
+**Version:** 1.3.0
+**Release Date:** February 9, 2026
 **Status:** Stable
 
 **Contributors:**
