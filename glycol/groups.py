@@ -57,9 +57,9 @@ class GroupsDatabase:
         """
         if db_path is None:
             if data_dir is None:
-                # Default to glycol/data/groups.json
+                # Default to glycol/data/type_groups.json
                 data_dir = Path(__file__).parent / "data"
-            db_path = Path(data_dir) / "groups.json"
+            db_path = Path(data_dir) / "type_groups.json"
         else:
             db_path = Path(db_path)
 
