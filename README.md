@@ -11,6 +11,7 @@ Real-time airport flight monitor built on the [OpenSky Network](https://opensky-
   - **Type group filter** (`--group`) - Filter by aircraft type group name (passenger, cargo, etc.)
   - **All traffic** (default) - Monitor all traffic
 - Tkinter GUI with real-time aircraft table and event log
+- **Clickable ICAO24 links** - Double-click aircraft or click event log links to view on ADSB-Exchange
 - CSV export of recorded events
 - OAuth2 authentication with automatic token refresh
 - API rate limit handling with backoff
