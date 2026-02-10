@@ -273,8 +273,12 @@ class GlycolApp:
         self.tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         vsb.pack(side=tk.RIGHT, fill=tk.Y)
 
-        # Bind double-click to open ICAO24 link
+        # Bind double-click and right-click to open ICAO24 link
         self.tree.bind("<Double-Button-1>", self._on_table_double_click)
+        self.tree.bind("<Button-2>", self._on_table_right_click)  # macOS right-click
+        self.tree.bind("<Button-3>", self._on_table_right_click)  # Windows/Linux right-click
+        self.tree.bind("<Control-Button-1>", self._on_table_right_click)  # macOS ctrl-click
+        self.tree.bind("<Motion>", self._on_table_motion)
 
     def _build_event_log(self):
         frame = ttk.LabelFrame(self.root, text="Event Log", padding=4)
@@ -313,7 +317,7 @@ class GlycolApp:
         )
 
         if choice == 'yes':
-            url = f"https://opensky-network.org/aircraft-profile?icao24={icao24_lower}"
+            url = f"https://opensky-network.org/network/explorer?icao24={icao24_lower}"
         else:
             url = f"https://globe.adsbexchange.com/?icao={icao24_lower}"
 
@@ -321,13 +325,64 @@ class GlycolApp:
 
     def _on_table_double_click(self, event):
         """Handle double-click on aircraft table to open ICAO24 link."""
-        item = self.tree.selection()
+        item = self.tree.identify_row(event.y)
         if item:
-            values = self.tree.item(item[0], "values")
+            values = self.tree.item(item, "values")
             if values:
                 icao24 = values[0]  # ICAO24 is the first column
                 if icao24 and _ICAO24_RE.match(icao24):
-                    self._open_icao24_link(icao24)
+                    # Go directly to ADSB-Exchange
+                    url = f"https://globe.adsbexchange.com/?icao={icao24.lower()}"
+                    webbrowser.open(url)
+
+    def _on_table_right_click(self, event):
+        """Handle right-click on aircraft table to show context menu."""
+        item = self.tree.identify_row(event.y)
+        if item:
+            # Select the row
+            self.tree.selection_set(item)
+            values = self.tree.item(item, "values")
+            if values:
+                icao24 = values[0]
+                if icao24 and _ICAO24_RE.match(icao24):
+                    # Create context menu
+                    menu = tk.Menu(self.root, tearoff=0)
+                    menu.add_command(
+                        label=f"Open {icao24} in OpenSky Network",
+                        command=lambda: self._open_icao24_direct(icao24, "opensky")
+                    )
+                    menu.add_command(
+                        label=f"Open {icao24} in ADSB-Exchange",
+                        command=lambda: self._open_icao24_direct(icao24, "adsbex")
+                    )
+                    menu.post(event.x_root, event.y_root)
+
+    def _on_table_motion(self, event):
+        """Show tooltip when hovering over ICAO24 column."""
+        region = self.tree.identify_region(event.x, event.y)
+        if region == "cell":
+            column = self.tree.identify_column(event.x)
+            # Column #0 is the first visible column (ICAO24)
+            if column == "#1":
+                self.tree.config(cursor="hand2")
+                item = self.tree.identify_row(event.y)
+                if item:
+                    values = self.tree.item(item, "values")
+                    if values and values[0]:
+                        self._set_status(f"Double-click ICAO24 to open in ADSB-Exchange")
+            else:
+                self.tree.config(cursor="")
+        else:
+            self.tree.config(cursor="")
+
+    def _open_icao24_direct(self, icao24: str, site: str):
+        """Open ICAO24 link directly to specified site."""
+        icao24_lower = icao24.lower()
+        if site == "opensky":
+            url = f"https://opensky-network.org/network/explorer?icao24={icao24_lower}"
+        else:  # adsbex
+            url = f"https://globe.adsbexchange.com/?icao={icao24_lower}"
+        webbrowser.open(url)
 
     def _on_log_icao_click(self, event):
         """Handle click on ICAO24 link in event log."""
@@ -342,7 +397,9 @@ class GlycolApp:
             if tag.startswith("icao24_") and tag != "icao24_link":
                 icao24 = tag.split("_", 1)[1]
                 if _ICAO24_RE.match(icao24):
-                    self._open_icao24_link(icao24)
+                    # Go directly to ADSB-Exchange
+                    url = f"https://globe.adsbexchange.com/?icao={icao24.lower()}"
+                    webbrowser.open(url)
                     break
 
     # ---- Credentials ----
