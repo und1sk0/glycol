@@ -5,6 +5,77 @@ All notable changes to Glycol will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.0] - 2026-02-13
+
+### Added
+
+#### Web Interface
+- **Browser-Based UI** - Modern web interface as alternative to Tkinter GUI
+  - Flask web server with Server-Sent Events for real-time updates
+  - Responsive HTML/CSS/JavaScript design with gradient purple theme
+  - Accessible from any device with a web browser on the network
+  - Real-time aircraft table updates without page refresh
+  - Live event log showing takeoffs and landings as they happen
+  - All features from desktop GUI available in web interface
+
+#### New Files
+- `glycol/web.py` - Flask application with SSE streaming (315 lines)
+- `glycol/templates/index.html` - Web interface template (97 lines)
+- `glycol/static/style.css` - Responsive styling (297 lines)
+- `glycol/static/app.js` - Client-side JavaScript (267 lines)
+- `web_server.py` - Web server launcher script (63 lines)
+- `start_web.sh` - Quick start shell script (22 lines)
+- `WEB_README.md` - Comprehensive web interface documentation (186 lines)
+
+#### Features
+- **Real-Time Updates** - Server-Sent Events push updates to browser
+- **No Authentication Required** - Web UI uses backend credentials automatically
+- **Network Accessible** - Run with `--host 0.0.0.0` to access from other devices
+- **CSV Export** - Download event logs directly from browser
+- **Clickable ICAO24 Links** - Open aircraft on ADSB-Exchange with one click
+- **Status Bar** - Shows authentication, monitoring status, rate limits, and event count
+- **All Filtering Options** - Aircraft filter, type group filter, and all traffic modes
+- **Port Configuration** - Customizable port via `--port` flag (default: 5000)
+
+### Changed
+- **README.md** - Updated to highlight both web and desktop interfaces
+- **requirements.txt** - Added Flask dependency
+
+### Fixed
+- Multiple interface compatibility issues during development:
+  - Corrected `get_states()` to accept bbox as tuple, not unpacked arguments
+  - Fixed `AircraftMonitor` method calls (using `process_states()` not `update()`)
+  - Fixed `EventStore` method calls (using `record_event()` not `add_event()`)
+  - Removed invalid `data_dir` parameters from `get_bounding_box()` and `airport_name()`
+  - Corrected event dictionary key mappings (`"type"` → `"event_type"`, `"altitude_m"` → `"altitude_ft"`)
+
+### Technical Details
+
+#### Architecture
+- **Backend**: Flask with threading for concurrent API polling and SSE broadcasting
+- **Frontend**: Vanilla JavaScript (no frameworks) with EventSource for SSE
+- **Real-Time**: Server-Sent Events for push updates from server to browser
+- **Polling**: Background thread queries OpenSky API at configured interval
+- **Broadcasting**: Events pushed to all connected browser clients via SSE
+
+#### API Endpoints
+- `GET /` - Main web interface
+- `POST /api/start` - Start monitoring an airport
+- `POST /api/stop` - Stop monitoring
+- `GET /api/status` - Get current status (auth, polling, events, rate limit)
+- `GET /api/events` - Get all recorded events as JSON
+- `GET /api/export_csv` - Download events as CSV file
+- `GET /api/groups` - Get available aircraft type groups
+- `GET /api/stream` - Server-Sent Events stream for real-time updates
+
+#### Event Types (SSE)
+- `aircraft_update` - Updated aircraft list and count
+- `new_events` - New takeoff/landing events detected
+- `rate_limit` - API rate limit status update
+
+### Breaking Changes
+- None - Web interface is an addition, existing CLI and GUI remain unchanged
+
 ## [1.3.1] - 2026-02-10
 
 ### Fixed
@@ -200,8 +271,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Release Information
 
-**Version:** 1.3.0
-**Release Date:** February 9, 2026
+**Version:** 2.0.0
+**Release Date:** February 13, 2026
 **Status:** Stable
 
 **Contributors:**
