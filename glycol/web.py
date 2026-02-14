@@ -108,18 +108,16 @@ class GlycolWebApp:
                 # Query API
                 states = self.client.get_states(bbox)
 
-                # Process states
+                # Process states for events
+                events = self.monitor.process_states(states)
+
+                # Record events
+                for event in events:
+                    self.store.record_event(event)
+
+                # Build aircraft list for display
                 aircraft_list = []
-                events = []
-
                 for state in states:
-                    # Check for events
-                    event = self.monitor.update(state)
-                    if event:
-                        self.store.record_event(event)
-                        events.append(event)
-
-                    # Build aircraft info
                     icao24 = state.get("icao24", "")
                     callsign = state.get("callsign", "")
                     on_ground = state.get("on_ground", False)
