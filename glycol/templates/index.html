@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glycol - Airport Monitor</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>✈️ Glycol - OpenSky Airport Monitor</h1>
+        </header>
+
+        <div class="controls">
+            <div class="control-group">
+                <label for="airport">Airport ICAO:</label>
+                <input type="text" id="airport" placeholder="e.g., KSFO" list="airport-list" maxlength="4">
+                <datalist id="airport-list">
+                    {% for airport in airports %}
+                    <option value="{{ airport }}">
+                    {% endfor %}
+                </datalist>
+            </div>
+
+            <div class="control-group">
+                <label for="filter-mode">Filter:</label>
+                <select id="filter-mode">
+                    <option value="all">All Traffic</option>
+                    <option value="aircraft">Aircraft</option>
+                    <option value="type_group">Type Group</option>
+                </select>
+            </div>
+
+            <div class="control-group" id="filter-value-group" style="display: none;">
+                <label for="filter-value">Value:</label>
+                <input type="text" id="filter-value" placeholder="ICAO24, tail, or group">
+            </div>
+
+            <div class="control-group">
+                <label for="interval">Poll Interval (s):</label>
+                <input type="number" id="interval" value="10" min="5" max="120">
+            </div>
+
+            <div class="control-group">
+                <button id="start-btn" class="btn btn-primary">Start</button>
+                <button id="stop-btn" class="btn btn-secondary" disabled>Stop</button>
+                <button id="export-btn" class="btn btn-secondary">Export CSV</button>
+            </div>
+        </div>
+
+        <div class="status-bar">
+            <span id="status-auth">Not authenticated</span>
+            <span id="status-polling">Idle</span>
+            <span id="status-rate-limit"></span>
+            <span id="status-events">Events: 0</span>
+        </div>
+
+        <div class="content">
+            <div class="panel">
+                <h2>Aircraft in Range</h2>
+                <div class="table-container">
+                    <table id="aircraft-table">
+                        <thead>
+                            <tr>
+                                <th>ICAO24</th>
+                                <th>Callsign</th>
+                                <th>Status</th>
+                                <th>Altitude (ft)</th>
+                                <th>Speed (kts)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="aircraft-tbody">
+                            <tr>
+                                <td colspan="5" class="no-data">No data - select an airport and click Start</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h2>Event Log</h2>
+                <div class="event-log" id="event-log">
+                    <div class="no-data">No events recorded</div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>Powered by <a href="https://opensky-network.org/" target="_blank">OpenSky Network</a></p>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
