@@ -10,7 +10,9 @@ Real-time airport flight monitor built on the [OpenSky Network](https://opensky-
   - **Aircraft filter** (`--aircraft`) - Filter by ICAO24 address or tail number
   - **Type group filter** (`--group`) - Filter by aircraft type group name (passenger, cargo, etc.)
   - **All traffic** (default) - Monitor all traffic
-- Tkinter GUI with real-time aircraft table and event log
+- **Two interfaces available:**
+  - **Web Interface** - Modern browser-based UI with real-time updates
+  - **Desktop GUI** - Tkinter GUI for standalone desktop use
 - **Clickable ICAO24 links** - Double-click aircraft or click event log links to view on ADSB-Exchange
 - CSV export of recorded events
 - OAuth2 authentication with automatic token refresh
@@ -48,7 +50,27 @@ If this file exists and has valid credentials, Glycol will use them automaticall
 
 ## Usage
 
-### Running in Foreground
+### Web Interface (Recommended)
+
+For a modern browser-based experience with real-time updates:
+
+```bash
+# Quick start
+./start_web.sh
+
+# Or manually
+python web_server.py
+```
+
+Then open your browser to `http://127.0.0.1:5000`
+
+See [WEB_README.md](WEB_README.md) for detailed web interface documentation.
+
+### Desktop GUI
+
+For a traditional desktop application:
+
+#### Running in Foreground
 
 ```bash
 # Launch with defaults (select airport in the GUI)
