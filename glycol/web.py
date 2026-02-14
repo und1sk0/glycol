@@ -106,7 +106,7 @@ class GlycolWebApp:
                     continue
 
                 # Query API
-                states = self.client.get_states(*bbox)
+                states = self.client.get_states(bbox)
 
                 # Process states
                 aircraft_list = []
