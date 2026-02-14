@@ -159,12 +159,15 @@ class GlycolWebApp:
 
     def _format_event(self, event: dict) -> dict:
         """Format event for JSON serialization."""
+        altitude_m = event.get("altitude_m")
+        altitude_ft = round(altitude_m / 0.3048) if altitude_m is not None else None
+
         return {
-            "timestamp": event["timestamp"].isoformat() if hasattr(event["timestamp"], "isoformat") else str(event["timestamp"]),
-            "icao24": event["icao24"],
+            "timestamp": event.get("timestamp", ""),
+            "icao24": event.get("icao24", ""),
             "callsign": event.get("callsign", ""),
-            "event_type": event["event_type"],
-            "altitude_ft": event.get("altitude_ft"),
+            "event_type": event.get("type", ""),
+            "altitude_ft": altitude_ft,
         }
 
     def _setup_routes(self):
