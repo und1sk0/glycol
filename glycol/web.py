@@ -99,7 +99,7 @@ class GlycolWebApp:
                     continue
 
                 # Get bounding box for airport
-                bbox = get_bounding_box(self.current_airport, data_dir=self.data_dir)
+                bbox = get_bounding_box(self.current_airport)
                 if not bbox:
                     logging.warning(f"Airport {self.current_airport} not found")
                     time.sleep(self.poll_interval)
@@ -207,7 +207,7 @@ class GlycolWebApp:
                 self._poll_thread.start()
                 self._polling = True
 
-            airport_info = airport_name(airport, data_dir=self.data_dir)
+            airport_info = airport_name(airport)
             return jsonify({
                 "status": "started",
                 "airport": airport,
