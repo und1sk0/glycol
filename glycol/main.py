@@ -6,8 +6,6 @@ import secrets
 from datetime import datetime
 from pathlib import Path
 
-from glycol.ui import run_app
-
 
 class JsonFormatter(logging.Formatter):
     """
@@ -160,6 +158,9 @@ def main():
         logging.info(f"Data directory: {args.data_dir}")
     if args.logs_dir:
         logging.info(f"Logs directory: {args.logs_dir}")
+
+    # Import UI here to avoid loading tkinter in headless environments
+    from glycol.ui import run_app
 
     run_app(
         airport=args.airport,

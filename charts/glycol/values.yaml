@@ -1,0 +1,163 @@
+# Default values for glycol.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: glycol-web
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+# OpenSky Network credentials
+# IMPORTANT: These should be overridden via --set or a separate values file
+# Example: helm install glycol ./charts/glycol --set credentials.clientId=xxx --set credentials.clientSecret=yyy
+credentials:
+  # Option 1: Provide credentials directly (will create a secret)
+  clientId: ""
+  clientSecret: ""
+
+  # Option 2: Reference an existing secret
+  # If existingSecret is set, clientId and clientSecret are ignored
+  existingSecret: ""
+  # Key in the secret that contains credentials.json
+  existingSecretKey: "credentials.json"
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Automatically mount a ServiceAccount's API credentials?
+  automount: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+podLabels: {}
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  fsGroup: 1000
+
+securityContext:
+  capabilities:
+    drop:
+    - ALL
+  readOnlyRootFilesystem: false
+  allowPrivilegeEscalation: false
+
+service:
+  type: ClusterIP
+  port: 8666
+  targetPort: 8666
+  # annotations: {}
+  # loadBalancerIP: ""
+  # loadBalancerSourceRanges: []
+
+ingress:
+  enabled: false
+  className: "nginx"
+  annotations: {}
+    # cert-manager.io/cluster-issuer: letsencrypt-prod
+    # nginx.ingress.kubernetes.io/ssl-redirect: "true"
+  hosts:
+    - host: glycol.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+  #  - secretName: glycol-tls
+  #    hosts:
+  #      - glycol.example.com
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 250m
+    memory: 256Mi
+
+livenessProbe:
+  httpGet:
+    path: /healthz/live
+    port: http
+  initialDelaySeconds: 10
+  periodSeconds: 30
+  timeoutSeconds: 5
+  successThreshold: 1
+  failureThreshold: 3
+
+readinessProbe:
+  httpGet:
+    path: /healthz/ready
+    port: http
+  initialDelaySeconds: 5
+  periodSeconds: 10
+  timeoutSeconds: 5
+  successThreshold: 1
+  failureThreshold: 3
+
+# Horizontal Pod Autoscaler
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+
+# Additional volumes on the output Deployment definition.
+volumes: []
+# - name: foo
+#   secret:
+#     secretName: mysecret
+#     optional: false
+
+# Additional volumeMounts on the output Deployment definition.
+volumeMounts: []
+# - name: foo
+#   mountPath: "/etc/foo"
+#   readOnly: true
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+# Application-specific configuration
+config:
+  # Port the Flask app listens on inside the container
+  port: 8666
+  # Host the Flask app binds to
+  host: "0.0.0.0"
+  # Python buffering
+  pythonUnbuffered: "1"
+
+# Persistence for logs
+persistence:
+  enabled: false
+  # storageClass: "-"
+  accessMode: ReadWriteOnce
+  size: 1Gi
+  # annotations: {}
+  # existingClaim: ""
+
+# Extra environment variables
+extraEnv: []
+# - name: DEBUG
+#   value: "true"
+
+# Extra init containers
+initContainers: []
+
+# Extra containers to run alongside the main container
+extraContainers: []
