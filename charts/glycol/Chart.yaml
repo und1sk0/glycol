@@ -1,0 +1,29 @@
+apiVersion: v2
+name: glycol
+description: A Helm chart for Glycol - Real-time airport flight monitoring using OpenSky Network API
+type: application
+
+# This is the chart version. This version number should be incremented each time you make changes
+# to the chart and its templates, including the app version.
+version: 0.1.0
+
+# This is the version number of the application being deployed.
+appVersion: "2.1.0"
+
+keywords:
+  - aviation
+  - flight-tracking
+  - opensky
+  - monitoring
+  - aircraft
+
+home: https://github.com/yourusername/glycol
+sources:
+  - https://github.com/yourusername/glycol
+
+maintainers:
+  - name: Glycol Team
+    email: glycol@example.com
+
+# Icon for the chart (optional)
+# icon: https://example.com/glycol-icon.png

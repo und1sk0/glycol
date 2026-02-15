@@ -265,6 +265,29 @@ class GlycolWebApp:
                 "rate_limit": self.client.rate_limit_remaining if self.client else None
             })
 
+        @self.app.route("/healthz")
+        @self.app.route("/healthz/ready")
+        def healthz_ready():
+            """Readiness probe - returns 200 if authenticated and ready to serve."""
+            if self.client is not None:
+                return jsonify({
+                    "status": "ready",
+                    "authenticated": True
+                }), 200
+            else:
+                return jsonify({
+                    "status": "not ready",
+                    "authenticated": False,
+                    "error": "Not authenticated with OpenSky API"
+                }), 503
+
+        @self.app.route("/healthz/live")
+        def healthz_live():
+            """Liveness probe - returns 200 if app is running."""
+            return jsonify({
+                "status": "alive"
+            }), 200
+
         @self.app.route("/api/stream")
         def stream():
             """Server-Sent Events endpoint for real-time updates."""

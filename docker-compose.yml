@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  glycol-web:
+    build: .
+    container_name: glycol-web
+    ports:
+      - "${PORT:-8666}:8666"
+    environment:
+      - PORT=8666
+      - HOST=0.0.0.0
+    volumes:
+      # Mount credentials file (required)
+      - ./glycol/data/credentials.json:/app/glycol/data/credentials.json:ro
+      # Mount logs directory (optional, for persistence)
+      - ./logs:/app/logs
+      # Mount custom data directory (optional)
+      - ./glycol/data:/app/glycol/data:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8666/healthz/live"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s

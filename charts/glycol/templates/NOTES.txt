@@ -1,0 +1,67 @@
+🛫 Glycol has been deployed!
+
+1. Get the application URL by running these commands:
+{{- if .Values.ingress.enabled }}
+{{- range $host := .Values.ingress.hosts }}
+  {{- range .paths }}
+  http{{ if $.Values.ingress.tls }}s{{ end }}://{{ $host.host }}{{ .path }}
+  {{- end }}
+{{- end }}
+{{- else if contains "NodePort" .Values.service.type }}
+  export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ include "glycol.fullname" . }})
+  export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
+  echo http://$NODE_IP:$NODE_PORT
+{{- else if contains "LoadBalancer" .Values.service.type }}
+     NOTE: It may take a few minutes for the LoadBalancer IP to be available.
+           You can watch the status of by running 'kubectl get --namespace {{ .Release.Namespace }} svc -w {{ include "glycol.fullname" . }}'
+  export SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ include "glycol.fullname" . }} --template "{{"{{ range (index .status.loadBalancer.ingress 0) }}{{.}}{{ end }}"}}")
+  echo http://$SERVICE_IP:{{ .Values.service.port }}
+{{- else if contains "ClusterIP" .Values.service.type }}
+  export POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} -l "app.kubernetes.io/name={{ include "glycol.name" . }},app.kubernetes.io/instance={{ .Release.Name }}" -o jsonpath="{.items[0].metadata.name}")
+  export CONTAINER_PORT=$(kubectl get pod --namespace {{ .Release.Namespace }} $POD_NAME -o jsonpath="{.spec.containers[0].ports[0].containerPort}")
+  echo "Visit http://127.0.0.1:8666 to use your application"
+  kubectl --namespace {{ .Release.Namespace }} port-forward $POD_NAME 8666:$CONTAINER_PORT
+{{- end }}
+
+2. Check the status of your deployment:
+  kubectl get pods --namespace {{ .Release.Namespace }} -l "app.kubernetes.io/name={{ include "glycol.name" . }},app.kubernetes.io/instance={{ .Release.Name }}"
+
+3. View logs:
+  kubectl logs --namespace {{ .Release.Namespace }} -l "app.kubernetes.io/name={{ include "glycol.name" . }},app.kubernetes.io/instance={{ .Release.Name }}" -f
+
+4. Check health endpoints:
+  # Liveness probe (should always return 200 if app is running)
+  kubectl exec --namespace {{ .Release.Namespace }} -it deploy/{{ include "glycol.fullname" . }} -- wget -qO- http://localhost:{{ .Values.config.port }}/healthz/live
+
+  # Readiness probe (returns 200 if authenticated, 503 if not)
+  kubectl exec --namespace {{ .Release.Namespace }} -it deploy/{{ include "glycol.fullname" . }} -- wget -qO- http://localhost:{{ .Values.config.port }}/healthz/ready
+
+{{- if not .Values.credentials.existingSecret }}
+{{- if and (not .Values.credentials.clientId) (not .Values.credentials.clientSecret) }}
+
+⚠️  WARNING: No OpenSky credentials configured!
+
+   To configure credentials, upgrade the release with:
+
+   helm upgrade {{ .Release.Name }} {{ .Chart.Name }} \
+     --set credentials.clientId=YOUR_CLIENT_ID \
+     --set credentials.clientSecret=YOUR_CLIENT_SECRET
+
+   Or create a secret manually and reference it:
+
+   kubectl create secret generic glycol-creds \
+     --from-literal=credentials.json='{"client_id":"xxx","client_secret":"yyy"}'
+
+   helm upgrade {{ .Release.Name }} {{ .Chart.Name }} \
+     --set credentials.existingSecret=glycol-creds
+
+{{- end }}
+{{- end }}
+
+📚 For more information:
+   - Chart: {{ .Chart.Name }} v{{ .Chart.Version }}
+   - App Version: {{ .Chart.AppVersion }}
+   - Namespace: {{ .Release.Namespace }}
+   - Release: {{ .Release.Name }}
+
+Happy flight tracking! ✈️

@@ -62,9 +62,51 @@ For a modern browser-based experience with real-time updates:
 python web_server.py
 ```
 
-Then open your browser to `http://127.0.0.1:5000`
+Then open your browser to `http://127.0.0.1:8666`
 
 See [WEB_README.md](WEB_README.md) for detailed web interface documentation.
+
+## Deployment
+
+### Docker
+
+Run Glycol in a container with Docker or Docker Compose:
+
+```bash
+# Build the image
+docker build -t glycol-web:2.1.0 .
+
+# Run with Docker
+docker run -d \
+  --name glycol-web \
+  -p 8666:8666 \
+  -v $(pwd)/glycol/data/credentials.json:/app/glycol/data/credentials.json:ro \
+  glycol-web:2.1.0
+
+# Or use Docker Compose
+docker compose up -d
+```
+
+See [DOCKER.md](DOCKER.md) for comprehensive Docker deployment documentation.
+
+### Kubernetes
+
+Deploy to Kubernetes using Helm (recommended) or raw manifests:
+
+```bash
+# Using Helm
+helm install glycol ./charts/glycol \
+  --set credentials.clientId=YOUR_CLIENT_ID \
+  --set credentials.clientSecret=YOUR_CLIENT_SECRET
+
+# Using kubectl
+kubectl apply -f k8s/
+
+# Access via port-forward
+kubectl port-forward -n glycol svc/glycol 8666:8666
+```
+
+See [charts/glycol/README.md](charts/glycol/README.md) for Helm documentation or [k8s/README.md](k8s/README.md) for kubectl deployment.
 
 ### Desktop GUI
 

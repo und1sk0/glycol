@@ -5,6 +5,89 @@ All notable changes to Glycol will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0] - 2026-02-14
+
+### Added
+
+#### Docker Support
+- **Multi-Stage Dockerfile** - Optimized Alpine Linux build for minimal image size (~240MB)
+  - Stage 1: Build dependencies with compilation tools
+  - Stage 2: Runtime-only environment with stripped-down image
+  - Non-root user execution (glycol, UID 1000)
+  - Default port: 8666 (configurable via environment variables)
+- **Docker Compose Configuration** - Simple deployment with `docker compose up`
+- **Health Check Endpoints** - Kubernetes/Docker-ready probes
+  - `/healthz/live` - Liveness probe (returns 200 if app is running)
+  - `/healthz/ready` or `/healthz` - Readiness probe (returns 200 if authenticated, 503 if not)
+- **Comprehensive Documentation** - `DOCKER.md` with deployment guides
+  - Docker run examples with volume mounts
+  - Docker Compose usage
+  - Kubernetes deployment manifests with liveness/readiness probes
+  - Security best practices (non-root, read-only credentials)
+  - Production deployment considerations
+
+#### Kubernetes Support
+- **Helm Chart** - Production-ready Helm chart in `charts/glycol/`
+  - Configurable credentials (inline or existing secret)
+  - Optional ingress with TLS support
+  - Horizontal Pod Autoscaling (HPA)
+  - Persistent volume support for logs
+  - ServiceAccount with configurable permissions
+  - Resource limits and requests
+  - Pod security contexts
+- **Kubernetes Manifests** - Raw manifests in `k8s/` directory
+  - Namespace isolation
+  - Deployment with rolling updates
+  - Service (ClusterIP)
+  - Ingress example
+  - Secret management
+  - Deployment scripts
+- **Kubernetes Documentation** - `k8s/README.md` with deployment guides
+  - Minikube, kind, and k3s examples
+  - Production deployment best practices
+  - Troubleshooting guide
+
+#### New Files
+- `Dockerfile` - Multi-stage Alpine build with health checks
+- `.dockerignore` - Optimized build context
+- `docker-compose.yml` - Simple deployment configuration
+- `DOCKER.md` - Comprehensive Docker and Kubernetes documentation
+- `charts/glycol/Chart.yaml` - Helm chart metadata
+- `charts/glycol/values.yaml` - Default Helm values
+- `charts/glycol/templates/*` - Helm templates (deployment, service, ingress, etc.)
+- `charts/glycol/README.md` - Helm chart documentation
+- `charts/deploy-helm.sh` - Automated Helm deployment script
+- `k8s/namespace.yaml` - Kubernetes namespace
+- `k8s/deployment.yaml` - Kubernetes deployment
+- `k8s/service.yaml` - Kubernetes service
+- `k8s/ingress.yaml` - Kubernetes ingress example
+- `k8s/secret.yaml` - Kubernetes secret template
+- `k8s/deploy.sh` - Automated Kubernetes deployment script
+- `k8s/README.md` - Kubernetes deployment documentation
+
+#### Features
+- **Containerized Deployment** - Run Glycol web interface in Docker/Kubernetes
+- **Health Monitoring** - Built-in liveness and readiness probes
+- **Minimal Image Size** - Alpine-based build (~240MB vs ~1GB standard Python)
+- **Security Hardening** - Non-root execution, read-only credential mounts
+- **Port Standardization** - Consistent port 8666 for all external access
+- **Production Ready** - Helm chart with HPA, ingress, and resource management
+- **Flexible Secret Management** - Support for inline credentials, existing secrets, or External Secrets Operator
+
+### Changed
+- **Web Server** - Added health check endpoints for container orchestration
+- **Port Configuration** - Standardized on port 8666 for external access (was 5000)
+  - Container runs on 8666
+  - Service exposes 8666
+  - Port-forward uses 8666:8666
+  - Docker uses -p 8666:8666
+- **Import Structure** - Made tkinter import lazy to support headless container environments
+  - Moved UI import from module level to function level in `glycol/main.py`
+  - Prevents ImportError when running web server in containers without GUI libraries
+
+### Fixed
+- **Container Compatibility** - Fixed tkinter import error in headless Docker environments
+
 ## [2.0.0] - 2026-02-13
 
 ### Added
