@@ -5,6 +5,14 @@ All notable changes to Glycol will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.1] - 2026-02-16
+
+### Added
+- **Airport code in event log** - Each takeoff/landing event now includes the monitored airport code
+  - Desktop GUI event log shows `[KSFO]` tag in each event line
+  - Web UI event log shows `@ KSFO` next to the event type (e.g. `🛫 Takeoff @ KSFO`)
+  - Airport code included in event dicts from `AircraftMonitor.process_states()` and serialized through the web API
+
 ## [2.1.0] - 2026-02-14
 
 ### Added
@@ -354,8 +362,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Release Information
 
-**Version:** 2.0.0
-**Release Date:** February 13, 2026
+**Version:** 2.1.1
+**Release Date:** February 16, 2026
 **Status:** Stable
 
 **Contributors:**
