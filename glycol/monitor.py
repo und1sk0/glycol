@@ -62,10 +62,10 @@ class AircraftMonitor:
         # Unknown filter mode - default to allow
         return True
 
-    def process_states(self, states: list[dict]) -> list[dict]:
+    def process_states(self, states: list[dict], airport: str = "") -> list[dict]:
         """Process a batch of state vectors and return detected events.
 
-        Each event is a dict with keys: type, icao24, callsign, timestamp, and
+        Each event is a dict with keys: type, icao24, callsign, airport, timestamp, and
         all other state vector fields.
         """
         events: list[dict] = []
@@ -88,13 +88,13 @@ class AircraftMonitor:
             if icao24 in self._prev_states:
                 was_ground = self._prev_states[icao24]
                 if was_ground and not on_ground:
-                    events.append(self._make_event("takeoff", state, now))
+                    events.append(self._make_event("takeoff", state, now, airport))
                 elif not was_ground and on_ground:
-                    events.append(self._make_event("landing", state, now))
+                    events.append(self._make_event("landing", state, now, airport))
             else:
                 # New aircraft in bounding box
                 etype = "new_ground" if on_ground else "new_airborne"
-                events.append(self._make_event(etype, state, now))
+                events.append(self._make_event(etype, state, now, airport))
 
         self._prev_states = current
         return events
@@ -104,12 +104,13 @@ class AircraftMonitor:
         self._prev_states.clear()
 
     @staticmethod
-    def _make_event(event_type: str, state: dict, timestamp: str) -> dict:
+    def _make_event(event_type: str, state: dict, timestamp: str, airport: str = "") -> dict:
         return {
             "type": event_type,
             "timestamp": timestamp,
             "icao24": state.get("icao24", ""),
             "callsign": state.get("callsign", ""),
+            "airport": airport,
             "latitude": state.get("latitude"),
             "longitude": state.get("longitude"),
             "altitude_m": state.get("baro_altitude"),

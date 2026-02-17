@@ -74,14 +74,14 @@ Run Glycol in a container with Docker or Docker Compose:
 
 ```bash
 # Build the image
-docker build -t glycol-web:2.1.0 .
+docker build -t glycol-web:2.1.1 .
 
 # Run with Docker
 docker run -d \
   --name glycol-web \
   -p 8666:8666 \
   -v $(pwd)/glycol/data/credentials.json:/app/glycol/data/credentials.json:ro \
-  glycol-web:2.1.0
+  glycol-web:2.1.1
 
 # Or use Docker Compose
 docker compose up -d

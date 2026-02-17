@@ -5,7 +5,7 @@ metadata:
   namespace: glycol
   labels:
     app: glycol-web
-    version: "2.1.0"
+    version: "2.1.1"
 spec:
   replicas: 1
   strategy:
@@ -20,7 +20,7 @@ spec:
     metadata:
       labels:
         app: glycol-web
-        version: "2.1.0"
+        version: "2.1.1"
     spec:
       securityContext:
         runAsNonRoot: true
@@ -28,17 +28,13 @@ spec:
         fsGroup: 1000
       containers:
       - name: glycol-web
-        image: glycol-web:2.1.0
+        image: glycol-web:2.1.1
         imagePullPolicy: IfNotPresent
         ports:
-        - containerPort: 5000
+        - containerPort: 8666
           name: http
           protocol: TCP
         env:
-        - name: PORT
-          value: "5000"
-        - name: HOST
-          value: "0.0.0.0"
         - name: PYTHONUNBUFFERED
           value: "1"
         volumeMounts:
@@ -52,7 +48,7 @@ spec:
         livenessProbe:
           httpGet:
             path: /healthz/live
-            port: 5000
+            port: 8666
             scheme: HTTP
           initialDelaySeconds: 10
           periodSeconds: 30
@@ -63,7 +59,7 @@ spec:
         readinessProbe:
           httpGet:
             path: /healthz/ready
-            port: 5000
+            port: 8666
             scheme: HTTP
           initialDelaySeconds: 5
           periodSeconds: 10
@@ -80,7 +76,7 @@ spec:
       volumes:
       - name: credentials
         secret:
-          secretName: glycol-credentials
+          secretName: glycol-opensky-creds
           items:
           - key: credentials.json
             path: credentials.json
