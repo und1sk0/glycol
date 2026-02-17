@@ -218,9 +218,10 @@ function addEvents(events) {
         const timestamp = new Date(event.timestamp).toLocaleTimeString();
         const eventType = event.event_type === 'takeoff' ? '🛫 Takeoff' : '🛬 Landing';
         const altitude = event.altitude_ft !== null ? `${event.altitude_ft.toLocaleString()} ft` : 'N/A';
+        const airportStr = event.airport ? ` @ ${event.airport}` : '';
 
         eventDiv.innerHTML = `
-            <div class="event-time">${timestamp} - ${eventType}</div>
+            <div class="event-time">${timestamp} - ${eventType}${airportStr}</div>
             <div class="event-details">
                 <span class="clickable" onclick="openADSB('${event.icao24}')">${event.icao24}</span>
                 ${event.callsign ? `(${event.callsign})` : ''} - Altitude: ${altitude}

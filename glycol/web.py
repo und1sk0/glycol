@@ -109,7 +109,7 @@ class GlycolWebApp:
                 states = self.client.get_states(bbox)
 
                 # Process states for events
-                events = self.monitor.process_states(states)
+                events = self.monitor.process_states(states, airport=self.current_airport)
 
                 # Record events
                 for event in events:
@@ -167,6 +167,7 @@ class GlycolWebApp:
             "icao24": event.get("icao24", ""),
             "callsign": event.get("callsign", ""),
             "event_type": event.get("type", ""),
+            "airport": event.get("airport", ""),
             "altitude_ft": altitude_ft,
         }
 

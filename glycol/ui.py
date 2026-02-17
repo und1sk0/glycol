@@ -502,7 +502,7 @@ class GlycolApp:
 
         self._poll_thread = threading.Thread(
             target=self._poll_loop,
-            args=(bbox, api_icao24_filter if filter_mode == "aircraft" else None),
+            args=(bbox, api_icao24_filter if filter_mode == "aircraft" else None, airport),
             daemon=True,
         )
         self._poll_thread.start()
@@ -516,11 +516,11 @@ class GlycolApp:
             path = self.store.save_csv()
             self._log(f"Events saved to {path}")
 
-    def _poll_loop(self, bbox, icao24_filter):
+    def _poll_loop(self, bbox, icao24_filter, airport=""):
         while not self._stop_event.is_set():
             try:
                 states = self.client.get_states(bbox, icao24_filter=icao24_filter)
-                events = self.monitor.process_states(states)
+                events = self.monitor.process_states(states, airport=airport)
 
                 for ev in events:
                     if ev["type"] in ("takeoff", "landing"):
@@ -580,12 +580,14 @@ class GlycolApp:
         alt = _fmt(ev.get("altitude_m"))
         spd = _fmt(ev.get("velocity_ms"))
         ts = ev.get("timestamp", "")[:19]
+        airport = ev.get("airport", "")
 
         # Look up type code
         type_code = ICAO24_TO_TYPE.get(icao.lower(), "?")
 
         # Build message with clickable ICAO24
-        prefix = f"[{tag}] {ts}  {cs} ("
+        airport_str = f"  [{airport}]" if airport else ""
+        prefix = f"[{tag}] {ts}{airport_str}  {cs} ("
         suffix = f")  {type_code}  alt={alt}m  spd={spd}m/s"
 
         self.log_text.config(state=tk.NORMAL)
