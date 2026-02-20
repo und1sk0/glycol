@@ -8,7 +8,7 @@ type: application
 version: 0.1.0
 
 # This is the version number of the application being deployed.
-appVersion: "2.1.2"
+appVersion: "2.2.0"
 
 keywords:
   - aviation

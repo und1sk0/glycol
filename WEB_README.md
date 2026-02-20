@@ -15,7 +15,7 @@ Browser-based version of the Glycol airport monitor. Access the application thro
    ```
 
 3. **Open your browser:**
-   Navigate to `http://127.0.0.1:5000`
+   Navigate to `http://127.0.0.1:8666`
 
 ## Features
 
@@ -32,7 +32,7 @@ Browser-based version of the Glycol airport monitor. Access the application thro
 ### Basic Usage
 
 ```bash
-# Run on default port (5000)
+# Run on default port (8666)
 python web_server.py
 
 # Run on custom port
@@ -132,7 +132,7 @@ Get your credentials from: https://opensky-network.org/
 
 ### Server won't start
 
-- Check if port is already in use: `lsof -i :5000`
+- Check if port is already in use: `lsof -i :8666`
 - Try a different port: `python web_server.py --port 8080`
 
 ### Not authenticated

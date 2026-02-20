@@ -10,7 +10,7 @@ fi
 
 # Default values
 HOST="${GLYCOL_HOST:-127.0.0.1}"
-PORT="${GLYCOL_PORT:-5000}"
+PORT="${GLYCOL_PORT:-8666}"
 
 echo "Starting Glycol Web Server..."
 echo "Server will be available at http://${HOST}:${PORT}"

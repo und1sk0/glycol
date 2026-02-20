@@ -149,6 +149,12 @@ config:
   host: "0.0.0.0"
   # Python buffering
   pythonUnbuffered: "1"
+  # Poll interval in seconds for API requests
+  pollInterval: 10
+  # Radius in nautical miles from airport
+  radiusNm: 5
+  # Altitude ceiling in feet
+  ceilingFt: 1500
 
 # Persistence for logs
 persistence:

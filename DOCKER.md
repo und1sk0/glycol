@@ -294,11 +294,11 @@ spec:
       - name: glycol-web
         image: glycol-web:2.1.0
         ports:
-        - containerPort: 5000
+        - containerPort: 8666
           name: http
         env:
         - name: PORT
-          value: "5000"
+          value: "8666"
         - name: HOST
           value: "0.0.0.0"
         volumeMounts:
@@ -311,7 +311,7 @@ spec:
         livenessProbe:
           httpGet:
             path: /healthz/live
-            port: 5000
+            port: 8666
           initialDelaySeconds: 10
           periodSeconds: 30
           timeoutSeconds: 5
@@ -319,7 +319,7 @@ spec:
         readinessProbe:
           httpGet:
             path: /healthz/ready
-            port: 5000
+            port: 8666
           initialDelaySeconds: 5
           periodSeconds: 10
           timeoutSeconds: 5
@@ -347,7 +347,7 @@ spec:
     app: glycol-web
   ports:
   - port: 80
-    targetPort: 5000
+    targetPort: 8666
     name: http
   type: ClusterIP
 ```
