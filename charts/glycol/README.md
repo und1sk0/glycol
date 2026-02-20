@@ -145,7 +145,7 @@ The following table lists the configurable parameters of the Glycol chart and th
 |-----------|-------------|---------|
 | `service.type` | Kubernetes service type | `ClusterIP` |
 | `service.port` | Service port | `80` |
-| `service.targetPort` | Container port | `5000` |
+| `service.targetPort` | Container port | `8666` |
 
 ### Ingress
 
@@ -201,7 +201,7 @@ The following table lists the configurable parameters of the Glycol chart and th
 
 | Parameter | Description | Default |
 |-----------|-------------|---------|
-| `config.port` | Flask app port | `5000` |
+| `config.port` | Flask app port | `8666` |
 | `config.host` | Flask app host | `0.0.0.0` |
 | `config.pythonUnbuffered` | Python buffering | `"1"` |
 
@@ -343,7 +343,7 @@ persistence:
 
 podAnnotations:
   prometheus.io/scrape: "true"
-  prometheus.io/port: "5000"
+  prometheus.io/port: "8666"
   prometheus.io/path: "/metrics"
 
 affinity:
@@ -406,10 +406,10 @@ kubectl logs -l app.kubernetes.io/name=glycol -f
 
 ```bash
 # Liveness
-kubectl exec -it deploy/glycol -- wget -qO- http://localhost:5000/healthz/live
+kubectl exec -it deploy/glycol -- wget -qO- http://localhost:8666/healthz/live
 
 # Readiness
-kubectl exec -it deploy/glycol -- wget -qO- http://localhost:5000/healthz/ready
+kubectl exec -it deploy/glycol -- wget -qO- http://localhost:8666/healthz/ready
 ```
 
 ### Debug configuration

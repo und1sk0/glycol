@@ -59,6 +59,12 @@ spec:
           value: {{ .Values.config.host | quote }}
         - name: PYTHONUNBUFFERED
           value: {{ .Values.config.pythonUnbuffered | quote }}
+        - name: POLL_INTERVAL
+          value: {{ .Values.config.pollInterval | quote }}
+        - name: RADIUS_NM
+          value: {{ .Values.config.radiusNm | quote }}
+        - name: CEILING_FT
+          value: {{ .Values.config.ceilingFt | quote }}
         {{- with .Values.extraEnv }}
         {{- toYaml . | nindent 8 }}
         {{- end }}

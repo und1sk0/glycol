@@ -5,6 +5,29 @@ All notable changes to Glycol will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.0] - 2026-02-19
+
+### Added
+- **Configurable Monitoring Parameters** - All core monitoring parameters now configurable via Helm chart
+  - `config.pollInterval` - API polling interval in seconds (default: 10)
+  - `config.radiusNm` - Monitoring radius in nautical miles from airport (default: 5)
+  - `config.ceilingFt` - Altitude ceiling in feet for tracking aircraft (default: 1500)
+  - Environment variables: `POLL_INTERVAL`, `RADIUS_NM`, `CEILING_FT`
+  - Command-line arguments: `--poll-interval`, `--radius-nm`, `--ceiling-ft`
+
+### Changed
+- **Port Standardization** - All remaining port 5000 references updated to 8666
+  - Updated `web_server.py` default port to 8666
+  - Updated `glycol/web.py` default port to 8666
+  - Updated `start_web.sh` default port to 8666
+  - Updated all documentation (WEB_README.md, DOCKER.md, charts/glycol/README.md)
+
+### Improved
+- **Environment Variable Support** - Web server now reads configuration from environment variables
+  - `HOST` and `PORT` now read from environment with proper defaults
+  - All monitoring parameters configurable via environment or CLI args
+  - Enables runtime configuration without code changes
+
 ## [2.1.2] - 2026-02-19
 
 ### Changed
@@ -396,7 +419,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Release Information
 
-**Version:** 2.1.2
+**Version:** 2.2.0
 **Release Date:** February 19, 2026
 **Status:** Stable
 

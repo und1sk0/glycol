@@ -15,15 +15,15 @@ echo ""
 
 # Build Docker image
 echo "📦 Building Docker image..."
-docker build -t glycol-web:2.1.2 ..
+docker build -t glycol-web:2.2.0 ..
 
 # Load image to cluster (for local clusters)
 if [ "$CLUSTER_TYPE" = "kind" ]; then
     echo "📥 Loading image to kind cluster..."
-    kind load docker-image glycol-web:2.1.2
+    kind load docker-image glycol-web:2.2.0
 elif [ "$CLUSTER_TYPE" = "minikube" ]; then
     echo "📥 Loading image to minikube..."
-    minikube image load glycol-web:2.1.2
+    minikube image load glycol-web:2.2.0
 elif [ "$CLUSTER_TYPE" = "k3s" ]; then
     echo "📥 Image available locally for k3s..."
 else

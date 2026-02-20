@@ -1,5 +1,6 @@
 import json
 import logging
+import os
 import queue
 import threading
 import time
@@ -20,18 +21,34 @@ from glycol.groups import GroupsDatabase
 class GlycolWebApp:
     """Web-based Glycol airport monitor using Flask and SSE."""
 
-    def __init__(self, data_dir: str | None = None, logs_dir: str | None = None):
+    def __init__(
+        self,
+        data_dir: str | None = None,
+        logs_dir: str | None = None,
+        poll_interval: int | None = None,
+        radius_nm: float | None = None,
+        ceiling_ft: float | None = None,
+    ):
         self.app = Flask(__name__,
                         template_folder=str(Path(__file__).parent / "templates"),
                         static_folder=str(Path(__file__).parent / "static"))
         self.data_dir = data_dir
         self.logs_dir = logs_dir
 
+        # Configuration from environment or parameters
+        self.poll_interval = poll_interval or int(os.getenv("POLL_INTERVAL", "10"))
+        self.radius_nm = radius_nm or float(os.getenv("RADIUS_NM", "5"))
+        self.ceiling_ft = ceiling_ft or float(os.getenv("CEILING_FT", "1500"))
+
         # State
         self.auth: OpenSkyAuth | None = None
         self.client: OpenSkyClient | None = None
         self.groups_db = GroupsDatabase(data_dir=data_dir)
-        self.monitor = AircraftMonitor(filter_mode=None, icao_to_type=ICAO24_TO_TYPE)
+        self.monitor = AircraftMonitor(
+            filter_mode=None,
+            icao_to_type=ICAO24_TO_TYPE,
+            ceiling_ft=self.ceiling_ft,
+        )
         self.store = EventStore(logs_dir=logs_dir)
 
         # Polling state
@@ -39,7 +56,6 @@ class GlycolWebApp:
         self._poll_thread: threading.Thread | None = None
         self._stop_event = threading.Event()
         self.current_airport = ""
-        self.poll_interval = 10
 
         # SSE state - queues for broadcasting updates
         self._event_queues: list[queue.Queue] = []
@@ -99,7 +115,7 @@ class GlycolWebApp:
                     continue
 
                 # Get bounding box for airport
-                bbox = get_bounding_box(self.current_airport)
+                bbox = get_bounding_box(self.current_airport, radius_nm=self.radius_nm)
                 if not bbox:
                     logging.warning(f"Airport {self.current_airport} not found")
                     time.sleep(self.poll_interval)
@@ -322,7 +338,7 @@ class GlycolWebApp:
                 }
             )
 
-    def run(self, host="127.0.0.1", port=5000, debug=False):
+    def run(self, host="127.0.0.1", port=8666, debug=False):
         """Run the Flask development server."""
         logging.info(f"Starting Glycol web server on http://{host}:{port}")
         self.app.run(host=host, port=port, debug=debug, threaded=True)
@@ -334,7 +350,21 @@ def create_app(data_dir: str | None = None, logs_dir: str | None = None) -> Flas
     return glycol_app.app
 
 
-def run_web_app(host="127.0.0.1", port=5000, data_dir: str | None = None, logs_dir: str | None = None):
+def run_web_app(
+    host="127.0.0.1",
+    port=8666,
+    data_dir: str | None = None,
+    logs_dir: str | None = None,
+    poll_interval: int | None = None,
+    radius_nm: float | None = None,
+    ceiling_ft: float | None = None,
+):
     """Convenience function to run the web app."""
-    app = GlycolWebApp(data_dir=data_dir, logs_dir=logs_dir)
+    app = GlycolWebApp(
+        data_dir=data_dir,
+        logs_dir=logs_dir,
+        poll_interval=poll_interval,
+        radius_nm=radius_nm,
+        ceiling_ft=ceiling_ft,
+    )
     app.run(host=host, port=port, debug=False)
