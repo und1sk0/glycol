@@ -4,6 +4,12 @@
 
 replicaCount: 1
 
+strategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxUnavailable: 0
+    maxSurge: 1
+
 image:
   repository: glycol-web
   pullPolicy: IfNotPresent
@@ -27,6 +33,8 @@ credentials:
   existingSecret: ""
   # Key in the secret that contains credentials.json
   existingSecretKey: "credentials.json"
+  # Path inside the container where credentials.json is mounted
+  mountPath: "/app/glycol/data/credentials.json"
 
 serviceAccount:
   # Specifies whether a service account should be created
@@ -148,6 +156,7 @@ persistence:
   # storageClass: "-"
   accessMode: ReadWriteOnce
   size: 1Gi
+  mountPath: "/app/logs"
   # annotations: {}
   # existingClaim: ""
 

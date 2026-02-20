@@ -5,6 +5,40 @@ All notable changes to Glycol will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.2] - 2026-02-19
+
+### Changed
+- **Helm Chart Consolidation** - Removed raw Kubernetes manifests (`k8s/` directory) in favor of Helm-only deployment
+  - Helm chart is now the canonical deployment method
+  - Updated README to reference only Helm deployment
+  - Renamed deployment examples to use `charts/` path
+
+### Improved
+- **Fully Templatized Helm Chart** - All hard-coded values moved to `values.yaml`
+  - Added `credentials.mountPath` for configurable credential file path
+  - Added `persistence.mountPath` for configurable log directory path
+  - Added `strategy.type` and `strategy.rollingUpdate` for configurable deployment strategy
+  - Secret name now uses `glycol.secretName` helper consistently
+  - PVC name now uses `glycol.pvcName` helper consistently
+  - Removed redundant if/else blocks in deployment template
+
+### Fixed
+- **Credentials Format Bug** - Fixed secret template to use `clientId`/`clientSecret` (camelCase) instead of `client_id`/`client_secret` (snake_case)
+  - This bug prevented authentication in Kubernetes deployments
+  - App expects camelCase keys per OpenSky API requirements
+- **Helm Chart Version** - Updated `Chart.yaml` appVersion from 2.1.0 to 2.1.1
+- **Deployment Scripts** - Updated `charts/deploy-helm.sh` to use correct image version (2.1.1) and port (8666)
+
+### Removed
+- **Raw Kubernetes Manifests** - Deleted `k8s/` directory and all raw YAML files
+  - `k8s/deployment.yaml`
+  - `k8s/service.yaml`
+  - `k8s/ingress.yaml`
+  - `k8s/secret.yaml`
+  - `k8s/namespace.yaml`
+  - `k8s/deploy.sh`
+  - `k8s/README.md`
+
 ## [2.1.1] - 2026-02-16
 
 ### Added
@@ -362,8 +396,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Release Information
 
-**Version:** 2.1.1
-**Release Date:** February 16, 2026
+**Version:** 2.1.2
+**Release Date:** February 19, 2026
 **Status:** Stable
 
 **Contributors:**
